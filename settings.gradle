@@ -1,1 +1,7 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal() // Gradle 플러그인 포털 추가 (기본 플러그인 제공)
+    }
+}
 rootProject.name = 'campusflow'
