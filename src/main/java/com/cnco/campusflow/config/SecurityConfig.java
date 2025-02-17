@@ -1,8 +1,11 @@
 package com.cnco.campusflow.config;
 
+import com.cnco.campusflow.jwt.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
@@ -16,22 +19,29 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    SecurityFilterChain web(HttpSecurity http) throws Exception {
+    public AuthenticationConfiguration authenticationConfiguration() {
+        return new AuthenticationConfiguration();
+    }
+
+    @Bean
+    public org.springframework.security.web.SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .httpBasic(HttpBasicConfigurer::disable)
-                .csrf(CsrfConfigurer::disable)
-                .cors().configurationSource(corsConfigurationSource()).and()
-                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user/**" ).permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .anyRequest().authenticated());
+                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/user/**").permitAll() // 로그인 & 토큰 갱신은 인증 없이 허용
+                        .anyRequest().authenticated() // 나머지 API는 인증 필요
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
 
         return http.build();
     }
