@@ -14,14 +14,7 @@ public class UserDetailsServiceConfig {
     private final AppUserRepository userRepository;
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> {
-            AppUserEntity user = userRepository.findByUserId(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
-            return org.springframework.security.core.userdetails.User
-                    .withUsername(user.getUserId())
-                    .password(user.getPassword())
-                    .authorities("USER") // 필요하면 역할 추가 가능
-                    .build();
-        };
+        return username -> userRepository.findByUserId(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
     }
 }

@@ -28,6 +28,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationConfiguration authenticationConfiguration() {
         return new AuthenticationConfiguration();
@@ -37,14 +38,17 @@ public class SecurityConfig {
     public org.springframework.security.web.SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/**").permitAll() // 로그인 & 토큰 갱신은 인증 없이 허용
+                        .requestMatchers("/user/signup", "/user/chk/**", "/user/login", "/user/refresh").permitAll() // 로그인 & 토큰 갱신은 인증 없이 허용
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated() // 나머지 API는 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
 
         return http.build();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

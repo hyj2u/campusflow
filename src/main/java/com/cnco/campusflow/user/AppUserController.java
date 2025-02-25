@@ -4,6 +4,7 @@ import com.cnco.campusflow.common.CommonResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,4 +43,9 @@ public class AppUserController {
     public ResponseEntity<?> refresh(@RequestBody RefreshRequestDto refreshToken) {
         return ResponseEntity.status(HttpStatus.CREATED).body(appUserService.refreshToken(refreshToken));
     }
+    @GetMapping("/profile")
+    public ResponseEntity<?>  getUserProfile(@AuthenticationPrincipal AppUserEntity userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(appUserService.getAppUserProfile(userDetails));
+    }
+
 }

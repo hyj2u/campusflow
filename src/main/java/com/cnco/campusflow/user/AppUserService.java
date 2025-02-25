@@ -29,6 +29,8 @@ public class AppUserService {
     private final RefreshTokenRepository refreshTokenRepository;
     @Value("${image.base.path}")
     private String imageBasePath; // Properties에서 이미지 경로 주입
+    @Value("${image.base.url}")
+    private String imageBaseUrl;
 
 
     public AppUserEntity registerUser(AppUserDto dto, MultipartFile profileImg, MultipartFile collegeImg) throws IOException {
@@ -129,6 +131,27 @@ public class AppUserService {
         }
         String newAccessToken = jwtUtil.generateAccessToken(tokenEntity.getAppUser().getUserId());
         return new TokenReponseDto(newAccessToken, request.getRefreshToken());
+    }
+    public AppUserProfileResponseDto getAppUserProfile(AppUserEntity user) {
+        AppUserProfileResponseDto dto = new AppUserProfileResponseDto();
+        dto.setUserId(user.getUserId());
+        dto.setNickname(user.getNickname());
+        dto.setPhone(user.getPhone());
+        dto.setUsername(user.getUsername());
+        dto.setBirthday(user.getBirthday());
+        dto.setUserStatus(user.getUserStatus());
+        dto.setAppUserId(user.getAppUserId());
+        dto.setApproveStatus(user.getApproveStatus());
+        if(user.getCollege()!=null){
+            dto.setEnterYear(user.getEnterYear());
+            dto.setMajor(user.getMajor());
+            dto.setCollegeId(user.getCollege().getCollegeId());
+            dto.setCollegeName(user.getCollege().getCollegeName());
+        }
+        if(user.getProfileImg()!=null){
+            dto.setProfileImgUrl(imageBaseUrl + "/" + user.getProfileImg().getImageId());
+        }
+        return dto;
     }
 
 
