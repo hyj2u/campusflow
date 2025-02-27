@@ -3,6 +3,7 @@ package com.cnco.campusflow.user;
 import com.cnco.campusflow.college.CollegeEntity;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.image.ImageEntity;
+import com.cnco.campusflow.timetable.TimetableEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -62,6 +63,9 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
     private String userStatus;
     @Column
     private String approveStatus;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "app_user_id") // timetable 테이블에 외래키 컬럼 생성
+    private List<TimetableEntity> timetables;
 
 
     @Override
