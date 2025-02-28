@@ -8,7 +8,8 @@ import java.io.IOException;
 
 @Component
 public class FileUtil {
-    public void saveFile(String basePath, String fileName, MultipartFile file) throws IOException {
+    public String saveFile(String basePath, MultipartFile file) throws IOException {
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         // 저장 경로 생성
         File directory = new File(basePath);
         if (!directory.exists()) {
@@ -20,5 +21,6 @@ public class FileUtil {
         // 파일 저장
         File destinationFile = new File(directory, fileName);
         file.transferTo(destinationFile);
+        return fileName;
     }
 }

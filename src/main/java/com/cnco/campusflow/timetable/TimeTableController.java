@@ -35,7 +35,7 @@ public class TimeTableController {
                 .body(CommonResponse.of( timeTableService.getTimeTableList(appUser)));
     }
     @GetMapping("/{tmTableId}")
-    public ResponseEntity<CommonResponse<?>> getTimeTableDtl(@PathVariable Long tmTableId, @RequestParam(required = false) Long day)  {
+    public ResponseEntity<CommonResponse<?>> getTimeTableDtl(@PathVariable Long tmTableId, @RequestParam(required = false) String day)  {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of( timeTableService.getTimeTableDtl(tmTableId, day)));
     }

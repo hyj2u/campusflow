@@ -59,8 +59,8 @@ public class TimeTableService {
         lecture.setLocation(courseDto.getLocation());
         lecture.setProfessor(courseDto.getProfessor());
         List<CodeEntity> days = new ArrayList<>();
-        for (Long codeId : courseDto.getDays()) {
-            days.add(codeRepository.findById(codeId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 요일입니다.")));
+        for (String codeCd : courseDto.getDays()) {
+            days.add(codeRepository.findByCodeCd(codeCd));
         }
         lecture.setDays(days);
         if (timetable.getCourses() == null) {
@@ -101,7 +101,7 @@ public class TimeTableService {
                 })
                 .collect(Collectors.toList());
     }
-    public TimeTableDtlDto getTimeTableDtl(Long timeTableId, Long day) {
+    public TimeTableDtlDto getTimeTableDtl(Long timeTableId, String day) {
         TimetableEntity timetable = timeTableRepository.findById(timeTableId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 Table Id입니다."));
         // DTO 변환
@@ -115,7 +115,7 @@ public class TimeTableService {
                         // day가 null이면 모든 course를 포함, day가 있으면 조건에 맞는 course만 포함
                         if (day == null) return true;
                         return course.getDays() != null &&
-                                course.getDays().stream().anyMatch(code -> Objects.equals(code.getCodeId(), day));
+                                course.getDays().stream().anyMatch(code -> Objects.equals(code.getCodeCd(), day));
                     })
                     .map(course -> {
                         CourseDto courseDto = new CourseDto();
@@ -129,7 +129,7 @@ public class TimeTableService {
                         // days 필드 설정: course.getDays()가 null이 아닌 경우 codeId 값 추출
                         if (course.getDays() != null) {
                             courseDto.setDays(course.getDays().stream()
-                                    .map(code -> code.getCodeId())
+                                    .map(code -> code.getCodeCd())
                                     .collect(Collectors.toList()));
                         }
                         return courseDto;

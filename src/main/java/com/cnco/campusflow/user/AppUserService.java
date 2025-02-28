@@ -63,10 +63,9 @@ public class AppUserService {
 
         // Profile 이미지 매핑
         if(profileImg!=null) {
-            // 파일 이름 생성
-            String fileName = System.currentTimeMillis() + "_" + profileImg.getOriginalFilename();
+
             // 파일 저장
-            fileUtil.saveFile(imageBasePath, fileName, profileImg);
+            String fileName =fileUtil.saveFile(imageBasePath, profileImg);
             // ImageEntity 생성 및 저장
             ImageEntity imageEntity = new ImageEntity();
             imageEntity.setImgNm(profileImg.getOriginalFilename());
@@ -75,9 +74,7 @@ public class AppUserService {
         }
         // College 이미지 매핑
         if (collegeImg != null) {
-            String fileName = System.currentTimeMillis() + "_" + collegeImg.getOriginalFilename();
-            // 파일 저장
-            fileUtil.saveFile(imageBasePath, fileName, collegeImg);
+            String fileName = fileUtil.saveFile(imageBasePath,collegeImg);
             // ImageEntity 생성 및 저장
             ImageEntity collegeImgEntity = new ImageEntity();
             collegeImgEntity.setImgNm(collegeImg.getOriginalFilename());
