@@ -19,10 +19,10 @@ public class CommunityController {
     private final CommunityService communityService;
 
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<?> addBoard(@RequestPart("board") CommunityBoardRequestDto boardDto, @RequestPart(value = "images", required = false)
+    public ResponseEntity<?> addBoard(@RequestPart CommunityBoardRequestDto board, @RequestPart(value = "images", required = false)
     List<MultipartFile> images,  @AuthenticationPrincipal AppUserEntity user) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CommonResponse.of(communityService.addBoard(boardDto, user, images)));
+                .body(CommonResponse.of(communityService.addBoard(board, user, images)));
     }
     @GetMapping ("/{boardId}")
     public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
