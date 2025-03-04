@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReplyResponseDto {
+
     private String content;
     private Long upTreeId;
     private Long appUserId;

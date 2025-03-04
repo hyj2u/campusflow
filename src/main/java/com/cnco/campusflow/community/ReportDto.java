@@ -5,10 +5,8 @@ import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CommunityBoardRequestDto {
+public class ReportDto {
     private Long boardId;
-    private String title;
-    private String content;
-    private String secretYn;
-    private String type;
+    private String reason;
+
 }

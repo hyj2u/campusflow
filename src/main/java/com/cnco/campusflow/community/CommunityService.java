@@ -26,6 +26,7 @@ public class CommunityService {
     private final CommunityBoardRepository communityBoardRepository;
     private final CodeRepository codeRepository;
     private final ReplyRepository replyRepository;
+    private final ReportRepository reportRepository;
     private final FileUtil fileUtil;
     @Value("${image.base.path}")
     private String imageBasePath; // Properties에서 이미지 경로 주입
@@ -33,14 +34,24 @@ public class CommunityService {
     private String imageBaseUrl;
 
     public CommunityBoardResponeDto addBoard(CommunityBoardRequestDto board, AppUserEntity appUser, List<MultipartFile> images) throws IOException {
-        CommunityBoardEntity boardEntity = new CommunityBoardEntity();
+        CommunityBoardEntity boardEntity;
+        List<ImageEntity> imageEntities;
+        if(board.getBoardId() == null){
+            boardEntity = new CommunityBoardEntity();
+            imageEntities = new ArrayList<>();
+        }else{
+            boardEntity = communityBoardRepository.findById(board.getBoardId()).orElseThrow(()
+                    -> new IllegalArgumentException("유효하지 않은 게시글 Id입니다."));
+            imageEntities = boardEntity.getImages();
+            imageEntities.clear();
+        }
         boardEntity.setTitle(board.getTitle());
         boardEntity.setContent(board.getContent());
         boardEntity.setAppUser(appUser);
         boardEntity.setSecretYn(board.getSecretYn());
         boardEntity.setViewCnt(0);
         boardEntity.setBoardType(codeRepository.findByCodeCd(board.getType()));
-        List<ImageEntity> imageEntities = new ArrayList<>();
+
         if(images != null) {
             for (MultipartFile image : images) {
                 String fileName = fileUtil.saveFile(imageBasePath, image);
@@ -65,8 +76,23 @@ public class CommunityService {
         dto.setAppUserId(boardEntity.getAppUser().getAppUserId());
         return dto;
     }
+    public void deleteBoard(Long boardId) {
+      communityBoardRepository.deleteById(boardId);
+    }
+    public Long reportBoard(ReportDto reportDto, AppUserEntity appUser) {
+        ReportEntity reportEntity = new ReportEntity();
+        reportEntity.setReason(reportDto.getReason());
+        reportEntity.setBoard(communityBoardRepository.findById(reportDto.getBoardId()).get());
+        reportEntity.setAppUser(appUser);
+        return reportRepository.save(reportEntity).getReportId();
+    }
     public ReplyResponseDto addReply(Long boardId, ReplyRequestDto reply, AppUserEntity appUser) {
-        ReplyEntity replyEntity = new ReplyEntity();
+        ReplyEntity replyEntity;
+        if(reply.getReplyId() != null) {
+            replyEntity = replyRepository.findById(reply.getReplyId()).get();
+        }else{
+            replyEntity = new ReplyEntity();
+        }
         replyEntity.setContent(reply.getContent());
         replyEntity.setAppUser(appUser);
         replyEntity.setBoard(communityBoardRepository.findById(boardId).get());
@@ -76,8 +102,9 @@ public class CommunityService {
             replyEntity.setUpTreeId(reply.getUpTreeId());
             replyEntity.setLevel(replyRepository.findById(reply.getUpTreeId()).get().getLevel()+1);
         }
-        replyRepository.save(replyEntity);
+        ReplyEntity newReply =replyRepository.save(replyEntity);
         ReplyResponseDto replyResponseDto =new ReplyResponseDto();
+        replyResponseDto.setReplyId(newReply.getReplyId());
         replyResponseDto.setContent(replyEntity.getContent());
         replyResponseDto.setUpTreeId(replyEntity.getUpTreeId());
         replyResponseDto.setLevel(replyEntity.getLevel());
@@ -86,6 +113,10 @@ public class CommunityService {
         replyResponseDto.setAppUserId(replyEntity.getAppUser().getAppUserId());
         return replyResponseDto;
     }
+    public List<CommunityBoardResponeDto> getFreeBoards(String order){
+
+    }
+
     public List<ReplyResponseDto> getReplies(Long boardId, String order) {
         List<ReplyEntity> replies;
 
@@ -108,6 +139,9 @@ public class CommunityService {
                         reply.getReplyId()
                 ))
                 .collect(Collectors.toList());
+    }
+    public void deleteReply(Long replyId) {
+       replyRepository.deleteById(replyId);
     }
 
 

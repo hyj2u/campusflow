@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReplyRequestDto {
+    private Long replyId;
     private String content;
     private Long upTreeId;
 }
