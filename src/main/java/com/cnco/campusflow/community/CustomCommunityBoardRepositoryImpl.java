@@ -46,5 +46,41 @@ public class CustomCommunityBoardRepositoryImpl implements CustomCommunityBoardR
 
         return new PageImpl<>(results, pageable, total);
     }
+
+    @Override
+    public Page<CommunityBoardEntity> findQnABoardWithSorting(Integer collegeId, String order, Pageable pageable) {
+        var query = queryFactory
+                .selectFrom(communityBoardEntity)
+                .where(communityBoardEntity.boardType.codeCd.eq("qna"));  // QnA 게시판만 조회
+
+        if (collegeId != null) {
+            // 특정 대학에 속한 사용자만 필터링
+            query.where(communityBoardEntity.appUser.college.collegeId.eq(collegeId));
+        }
+
+        if ("reply".equalsIgnoreCase(order)) {
+            // 댓글 개수 기준 정렬 (LEFT JOIN + GROUP BY 활용)
+            query.leftJoin(replyEntity).on(replyEntity.board.eq(communityBoardEntity))
+                    .groupBy(communityBoardEntity)
+                    .orderBy(replyEntity.count().desc()); // 댓글 많은 순 정렬
+        } else {
+            query.orderBy(communityBoardEntity.insertTimestamp.desc()); // 최신순 정렬
+        }
+
+        // 페이징 적용
+        List<CommunityBoardEntity> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 개수 조회
+        long total = queryFactory
+                .select(communityBoardEntity.count())
+                .from(communityBoardEntity)
+                .where(communityBoardEntity.boardType.codeCd.eq("qna"))
+                .fetchOne();
+
+        return new PageImpl<>(results, pageable, total);
+    }
 }
 

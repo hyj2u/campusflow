@@ -6,18 +6,14 @@ import com.cnco.campusflow.common.PaginatedResponse;
 import com.cnco.campusflow.image.ImageEntity;
 import com.cnco.campusflow.image.ImageResponseDto;
 import com.cnco.campusflow.user.AppUserEntity;
-import com.cnco.campusflow.user.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +34,7 @@ public class CommunityService {
     @Value("${image.base.url}")
     private String imageBaseUrl;
 
-    public CommunityBoardResponeDto addBoard(CommunityBoardRequestDto board, AppUserEntity appUser, List<MultipartFile> images) throws IOException {
+    public CommunityBoardResponseDto addBoard(CommunityBoardRequestDto board, AppUserEntity appUser, List<MultipartFile> images) throws IOException {
         CommunityBoardEntity boardEntity;
         List<ImageEntity> imageEntities;
         if (board.getBoardId() == null) {
@@ -68,16 +64,16 @@ public class CommunityService {
             boardEntity.setImages(imageEntities);
         }
         communityBoardRepository.save(boardEntity);
-        CommunityBoardResponeDto dto = convertEntityToDto(boardEntity);
+        CommunityBoardResponseDto dto = convertEntityToDto(boardEntity);
         dto.setNickname(appUser.getNickname());
         dto.setAppUserId(appUser.getAppUserId());
         return dto;
     }
 
-    public CommunityBoardResponeDto getBoard(Long boardId) {
+    public CommunityBoardResponseDto getBoard(Long boardId) {
         CommunityBoardEntity boardEntity = communityBoardRepository.findById(boardId).get();
         boardEntity.setViewCnt(boardEntity.getViewCnt() + 1);
-        CommunityBoardResponeDto dto = convertEntityToDto(boardEntity);
+        CommunityBoardResponseDto dto = convertEntityToDto(boardEntity);
         dto.setNickname(boardEntity.getAppUser().getNickname());
         dto.setAppUserId(boardEntity.getAppUser().getAppUserId());
         return dto;
@@ -123,10 +119,10 @@ public class CommunityService {
         return replyResponseDto;
     }
 
-    public PaginatedResponse<CommunityBoardResponeDto> getFreeBoards(String order, Pageable pageable) {
+    public PaginatedResponse<CommunityBoardResponseDto> getFreeBoards(String order, Pageable pageable) {
         Page<CommunityBoardEntity> boardPage = communityBoardRepository.findFreeBoardWithSorting(order, pageable);
 
-        List<CommunityBoardResponeDto> boardDtos = boardPage.getContent().stream()
+        List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
 
@@ -139,6 +135,21 @@ public class CommunityService {
         );
     }
 
+    public PaginatedResponse<CommunityBoardResponseDto> getQnABoards(Integer collegeId, String order, Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findQnABoardWithSorting(collegeId, order, pageable);
+
+        List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+
+        return new PaginatedResponse<>(
+                boardDtos,
+                boardPage.getNumber(),
+                boardPage.getSize(),
+                boardPage.getTotalElements(),
+                boardPage.getTotalPages()
+        );
+    }
     public List<ReplyResponseDto> getReplies(Long boardId, String order) {
         List<ReplyEntity> replies;
 
@@ -168,8 +179,8 @@ public class CommunityService {
     }
 
 
-    private CommunityBoardResponeDto convertEntityToDto(CommunityBoardEntity boardEntity) {
-        CommunityBoardResponeDto dto = new CommunityBoardResponeDto();
+    private CommunityBoardResponseDto convertEntityToDto(CommunityBoardEntity boardEntity) {
+        CommunityBoardResponseDto dto = new CommunityBoardResponseDto();
         dto.setBoardId(boardEntity.getBoardId());
         dto.setTitle(boardEntity.getTitle());
         dto.setContent(boardEntity.getContent());

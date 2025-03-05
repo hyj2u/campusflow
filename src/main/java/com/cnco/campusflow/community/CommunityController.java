@@ -66,5 +66,10 @@ public class CommunityController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(communityService.getFreeBoards(order, pageable)));
     }
+    @GetMapping ("/qna")
+    public ResponseEntity<?> getQnABoards(@RequestParam(required = false) Integer collegeId, @RequestParam String order, @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(communityService.getQnABoards(collegeId, order, pageable)));
+    }
 
 }
