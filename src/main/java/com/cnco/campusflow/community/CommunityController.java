@@ -1,9 +1,12 @@
 package com.cnco.campusflow.community;
 
 import com.cnco.campusflow.common.CommonResponse;
+import com.cnco.campusflow.common.PaginatedResponse;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -59,9 +62,9 @@ public class CommunityController {
                 .body(CommonResponse.of(communityService.reportBoard(reportDto, user)));
     }
     @GetMapping ("/free")
-    public ResponseEntity<?> getFreeBoards( @RequestParam String order) {
+    public ResponseEntity<?> getFreeBoards(@RequestParam String order, @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CommonResponse.of(communityService.getReplies(boardId, order)));
+                .body(CommonResponse.of(communityService.getFreeBoards(order, pageable)));
     }
 
 }

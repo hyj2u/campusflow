@@ -2,12 +2,17 @@ package com.cnco.campusflow.community;
 
 import com.cnco.campusflow.code.CodeRepository;
 import com.cnco.campusflow.common.FileUtil;
+import com.cnco.campusflow.common.PaginatedResponse;
 import com.cnco.campusflow.image.ImageEntity;
 import com.cnco.campusflow.image.ImageResponseDto;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.user.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,10 +41,10 @@ public class CommunityService {
     public CommunityBoardResponeDto addBoard(CommunityBoardRequestDto board, AppUserEntity appUser, List<MultipartFile> images) throws IOException {
         CommunityBoardEntity boardEntity;
         List<ImageEntity> imageEntities;
-        if(board.getBoardId() == null){
+        if (board.getBoardId() == null) {
             boardEntity = new CommunityBoardEntity();
             imageEntities = new ArrayList<>();
-        }else{
+        } else {
             boardEntity = communityBoardRepository.findById(board.getBoardId()).orElseThrow(()
                     -> new IllegalArgumentException("유효하지 않은 게시글 Id입니다."));
             imageEntities = boardEntity.getImages();
@@ -52,7 +57,7 @@ public class CommunityService {
         boardEntity.setViewCnt(0);
         boardEntity.setBoardType(codeRepository.findByCodeCd(board.getType()));
 
-        if(images != null) {
+        if (images != null) {
             for (MultipartFile image : images) {
                 String fileName = fileUtil.saveFile(imageBasePath, image);
                 ImageEntity imageEntity = new ImageEntity();
@@ -63,22 +68,25 @@ public class CommunityService {
             boardEntity.setImages(imageEntities);
         }
         communityBoardRepository.save(boardEntity);
-        CommunityBoardResponeDto dto=convertEntityToDto(boardEntity);
+        CommunityBoardResponeDto dto = convertEntityToDto(boardEntity);
         dto.setNickname(appUser.getNickname());
         dto.setAppUserId(appUser.getAppUserId());
         return dto;
     }
+
     public CommunityBoardResponeDto getBoard(Long boardId) {
         CommunityBoardEntity boardEntity = communityBoardRepository.findById(boardId).get();
-        boardEntity.setViewCnt(boardEntity.getViewCnt()+1);
-        CommunityBoardResponeDto dto=convertEntityToDto(boardEntity);
+        boardEntity.setViewCnt(boardEntity.getViewCnt() + 1);
+        CommunityBoardResponeDto dto = convertEntityToDto(boardEntity);
         dto.setNickname(boardEntity.getAppUser().getNickname());
         dto.setAppUserId(boardEntity.getAppUser().getAppUserId());
         return dto;
     }
+
     public void deleteBoard(Long boardId) {
-      communityBoardRepository.deleteById(boardId);
+        communityBoardRepository.deleteById(boardId);
     }
+
     public Long reportBoard(ReportDto reportDto, AppUserEntity appUser) {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setReason(reportDto.getReason());
@@ -86,24 +94,25 @@ public class CommunityService {
         reportEntity.setAppUser(appUser);
         return reportRepository.save(reportEntity).getReportId();
     }
+
     public ReplyResponseDto addReply(Long boardId, ReplyRequestDto reply, AppUserEntity appUser) {
         ReplyEntity replyEntity;
-        if(reply.getReplyId() != null) {
+        if (reply.getReplyId() != null) {
             replyEntity = replyRepository.findById(reply.getReplyId()).get();
-        }else{
+        } else {
             replyEntity = new ReplyEntity();
         }
         replyEntity.setContent(reply.getContent());
         replyEntity.setAppUser(appUser);
         replyEntity.setBoard(communityBoardRepository.findById(boardId).get());
-        if(reply.getUpTreeId()==null){
+        if (reply.getUpTreeId() == null) {
             replyEntity.setLevel(0);
-        }else{
+        } else {
             replyEntity.setUpTreeId(reply.getUpTreeId());
-            replyEntity.setLevel(replyRepository.findById(reply.getUpTreeId()).get().getLevel()+1);
+            replyEntity.setLevel(replyRepository.findById(reply.getUpTreeId()).get().getLevel() + 1);
         }
-        ReplyEntity newReply =replyRepository.save(replyEntity);
-        ReplyResponseDto replyResponseDto =new ReplyResponseDto();
+        ReplyEntity newReply = replyRepository.save(replyEntity);
+        ReplyResponseDto replyResponseDto = new ReplyResponseDto();
         replyResponseDto.setReplyId(newReply.getReplyId());
         replyResponseDto.setContent(replyEntity.getContent());
         replyResponseDto.setUpTreeId(replyEntity.getUpTreeId());
@@ -113,8 +122,21 @@ public class CommunityService {
         replyResponseDto.setAppUserId(replyEntity.getAppUser().getAppUserId());
         return replyResponseDto;
     }
-    public List<CommunityBoardResponeDto> getFreeBoards(String order){
 
+    public PaginatedResponse<CommunityBoardResponeDto> getFreeBoards(String order, Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findFreeBoardWithSorting(order, pageable);
+
+        List<CommunityBoardResponeDto> boardDtos = boardPage.getContent().stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+
+        return new PaginatedResponse<>(
+                boardDtos,
+                boardPage.getNumber(),
+                boardPage.getSize(),
+                boardPage.getTotalElements(),
+                boardPage.getTotalPages()
+        );
     }
 
     public List<ReplyResponseDto> getReplies(Long boardId, String order) {
@@ -140,8 +162,9 @@ public class CommunityService {
                 ))
                 .collect(Collectors.toList());
     }
+
     public void deleteReply(Long replyId) {
-       replyRepository.deleteById(replyId);
+        replyRepository.deleteById(replyId);
     }
 
 
@@ -157,11 +180,11 @@ public class CommunityService {
         dto.setViewCnt(boardEntity.getViewCnt());
         dto.setInsertTimestamp(boardEntity.getInsertTimestamp());
         List<ImageResponseDto> imageEntities = new ArrayList<>();
-        if(boardEntity.getImages() != null) {
+        if (boardEntity.getImages() != null) {
             for (ImageEntity image : boardEntity.getImages()) {
                 ImageResponseDto imageDto = new ImageResponseDto();
                 imageDto.setImageId(image.getImageId());
-                imageDto.setImageUrl(imageBaseUrl+"/"+image.getImageId());
+                imageDto.setImageUrl(imageBaseUrl + "/" + image.getImageId());
                 imageEntities.add(imageDto);
             }
             dto.setImages(imageEntities);
