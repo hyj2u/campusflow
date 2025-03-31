@@ -1,7 +1,7 @@
 package com.cnco.campusflow.community;
 
+
 import com.cnco.campusflow.code.CodeEntity;
-import com.cnco.campusflow.college.CollegeEntity;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.image.ImageEntity;
 import com.cnco.campusflow.user.AppUserEntity;

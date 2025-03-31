@@ -20,14 +20,10 @@ public class StoreService {
     private String imageBaseUrl;
     private final FavoriteStoreRepository favoriteStoreRepository;
 
-    public Page<StoreListDto> findStores(String search, Pageable pageable) {
-        Page<StoreEntity> storeEntities = storeRepository.findStores(search, pageable);
-        // StoreEntity -> StoreListDto 변환
-        return storeEntities.map(this::convertToDto);
+    public Page<StoreListDto> findStores(String search,Double latitude, Double longitude, Pageable pageable) {
+        return  storeRepository.findStores(search,latitude, longitude, pageable);
     }
-    public Page<StoreListDto> findStoresByDistance(Double latitude, Double longitude, Pageable pageable) {
-        return storeRepository.findStoresNear(latitude, longitude, pageable);
-    }
+
     public Page<StoreListDto> getMyStores(AppUserEntity appUser,  Pageable pageable) {
         // 즐겨찾기한 매장 조회 (FavoriteStoreEntity 리스트)
         Page<FavoriteStoreEntity> storeEntities = favoriteStoreRepository.findFavoriteStoreEntitiesByUserAppUserId(appUser.getAppUserId(), pageable);

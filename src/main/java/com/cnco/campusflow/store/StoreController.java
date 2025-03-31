@@ -21,9 +21,9 @@ public class StoreController {
     private final StoreService storeService;
 
     @GetMapping
-    public PaginatedResponse<StoreListDto> searchStores(@RequestParam(required = false) String search,
+    public PaginatedResponse<StoreListDto> searchStores(@RequestParam(required = false) String search,@RequestParam Double latitude, @RequestParam Double longitude ,
                                                         @PageableDefault(size = 10) Pageable pageable) {
-        Page<StoreListDto> page = storeService.findStores(search , pageable);
+        Page<StoreListDto> page = storeService.findStores(search, latitude, longitude, pageable);
         return new PaginatedResponse<>(
                 page.getContent(),       // 데이터 목록
                 page.getNumber(),        // 현재 페이지 번호
@@ -32,18 +32,7 @@ public class StoreController {
                 page.getTotalPages()     // 전체 페이지 수
         );
     }
-    @GetMapping("/dist")
-    public PaginatedResponse<StoreListDto> getStoresByDistance(@RequestParam Double latitude, @RequestParam Double longitude ,
-                                                        @PageableDefault(size = 10) Pageable pageable) {
-        Page<StoreListDto> page = storeService.findStoresByDistance(latitude, longitude, pageable);
-        return new PaginatedResponse<>(
-                page.getContent(),       // 데이터 목록
-                page.getNumber(),        // 현재 페이지 번호
-                page.getSize(),          // 페이지 크기
-                page.getTotalElements(), // 전체 요소 수
-                page.getTotalPages()     // 전체 페이지 수
-        );
-    }
+
     @GetMapping("/favorite")
     public PaginatedResponse<StoreListDto> getMyStores(@AuthenticationPrincipal AppUserEntity user, @PageableDefault(size = 10) Pageable pageable) {
         Page<StoreListDto> page = storeService.getMyStores(user,pageable);
@@ -65,6 +54,8 @@ public class StoreController {
         storeService.removeFavoriteStore(appUser, storeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+
 
 
 }
