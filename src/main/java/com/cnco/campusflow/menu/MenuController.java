@@ -3,6 +3,7 @@ package com.cnco.campusflow.menu;
 import com.cnco.campusflow.common.CommonResponse;
 import com.cnco.campusflow.optgrp.OptGrpResponseDto;
 import com.cnco.campusflow.user.AppUserEntity;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +38,23 @@ public class MenuController {
                 .body(CommonResponse.of(result));
     }
     @PostMapping("/favorite")
-    public ResponseEntity<?> addFavoriteMenu(@AuthenticationPrincipal AppUserEntity appUser, MenuRequestDto menuRequestDto) {
+    public ResponseEntity<?> addFavoriteMenu(@AuthenticationPrincipal AppUserEntity appUser, @RequestBody MenuRequestDto menuRequestDto)
+            throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.of(menuService.addFavoriteMenu(menuRequestDto,appUser)));
     }
+    @GetMapping("/favorite/{storeId}")
+    public ResponseEntity<?>getFavoriteMenu(@AuthenticationPrincipal AppUserEntity appUser, @PathVariable Long storeId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(menuService.getFavoriteMenu(storeId,appUser)));
+    }
+    @DeleteMapping("/favorite/{favoriteMenuId}")
+    public ResponseEntity<?>deleteFavoriteMenu( @PathVariable Long favoriteMenuId) {
+        menuService.deleteFavoriteMenu(favoriteMenuId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+
 
 
 
