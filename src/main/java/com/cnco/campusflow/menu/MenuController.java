@@ -11,7 +11,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/menu")
@@ -52,6 +54,26 @@ public class MenuController {
     public ResponseEntity<?>deleteFavoriteMenu( @PathVariable Long favoriteMenuId) {
         menuService.deleteFavoriteMenu(favoriteMenuId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @PostMapping("/cart")
+    public ResponseEntity<?> addCartMenu(@RequestBody MenuRequestDto menuRequestDto)
+            throws JsonProcessingException {
+        Map<String, Object> data = new HashMap<>();
+        data.put("menuId", menuService.addCartMenu(menuRequestDto).getMenuId());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponse.of(data));
+    }
+    @PutMapping("/cart/{menuId}")
+    public ResponseEntity<?> changeCartMenu(@PathVariable Long menuId, @RequestBody MenuRequestDto menuRequestDto)
+            throws JsonProcessingException {
+        menuService.changeCartMenu(menuId, menuRequestDto);
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/cart/{menuId}")
+    public ResponseEntity<?> deleteCartMenu(@PathVariable Long menuId)
+            throws JsonProcessingException {
+        menuService.deleteCartMenu(menuId);
+        return ResponseEntity.noContent().build();
     }
 
 

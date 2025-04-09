@@ -1,5 +1,7 @@
 package com.cnco.campusflow.order;
 
+import com.cnco.campusflow.menu.MenuEntity;
+import com.cnco.campusflow.menu.MenuRepository;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.user.AppUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ public class OrderService {
     private final ConsumerRepository consumerRepository;
     private final OrderAddressRepository orderAddressRepository;
     private final AppUserRepository appUserRepository;
+    private final MenuRepository menuRepository;
+    private final OrderRepository orderRepository;
 
     public ConsumerResponseDto addConsumerInfo(AppUserEntity appUser, ConsumerRequestDto consumerRequestDto) {
         ConsumerEntity consumerEntity = consumerRequestDto.getConsumerId() != null
@@ -89,6 +93,41 @@ public class OrderService {
         }
         orderAddressRepository.deleteById(orderAddressId);
     }
+    public OrderEntity addOrder(OrderRequestDto orderRequestDto) {
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderStatus("R");
+        orderEntity.setConsumer(consumerRepository.findById(orderRequestDto.getConsumerId()).get());
+        List<MenuEntity> menuEntities = new ArrayList<>();
+        for(Long menuId : orderRequestDto.getMenuIds()){
+            menuEntities.add(menuRepository.findById(menuId).get());
+        }
+        orderEntity.setStore(menuEntities.get(0).getStore());
+        orderEntity.setMenus(menuEntities);
+        orderEntity.setTotalPrice(orderRequestDto.getTotalPrice());
+        return orderRepository.save(orderEntity);
+    }
+   /* public OrderResponseDto getOrderHistory(AppUserEntity appUser) {
+        Long consumerId = appUser.getAppUserId(); // 또는 appUser.getConsumer().getId() 형식일 수도 있음
+        List<OrderEntity> orders = orderRepository.findAllByConsumerAppUserId(consumerId);
+
+        List<OrderDto> orderDtos = orders.stream().map(order -> {
+            OrderDto dto = new OrderDto();
+            dto.setOrderId(order.getOrderId());
+            dto.setTotalPrice(order.getTotalPrice());
+            dto.setOrderStatus(order.getOrderStatus());
+            dto.setOrderTime(order.getCreatedAt().toString()); // BaseEntity 상속 가정
+            dto.setMenuNames(
+                    order.getMenus().stream()
+                            .map(menu -> menu.getProduct().getProductNm())
+                            .collect(Collectors.toList())
+            );
+            return dto;
+        }).collect(Collectors.toList());
+
+        OrderResponseDto response = new OrderResponseDto();
+        response.setOrders(orderDtos);
+        return response;
+    }*/
 
     private ConsumerResponseDto toConsumerResponseDto(ConsumerEntity consumer, AppUserEntity user) {
         ConsumerResponseDto dto = new ConsumerResponseDto();

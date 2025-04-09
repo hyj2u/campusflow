@@ -3,10 +3,13 @@ package com.cnco.campusflow.user;
 import com.cnco.campusflow.college.CollegeEntity;
 import com.cnco.campusflow.college.CollegeRepository;
 import com.cnco.campusflow.common.FileUtil;
+import com.cnco.campusflow.common.SendUtil;
 import com.cnco.campusflow.image.ImageEntity;
 import com.cnco.campusflow.jwt.JwtUtil;
 import com.cnco.campusflow.jwt.RefreshTokenEntity;
 import com.cnco.campusflow.jwt.RefreshTokenRepository;
+import com.cnco.campusflow.sendinfo.SendInfoEntity;
+import com.cnco.campusflow.sendinfo.SendInfoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -27,6 +31,8 @@ public class AppUserService {
     private final FileUtil fileUtil;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final SendInfoRepository sendInfoRepository;
+    private final SendUtil sendUtil;
     @Value("${image.base.path}")
     private String imageBasePath; // Properties에서 이미지 경로 주입
     @Value("${image.base.url}")
@@ -149,6 +155,26 @@ public class AppUserService {
             dto.setProfileImgUrl(imageBaseUrl + "/" + user.getProfileImg().getImageId());
         }
         return dto;
+    }
+    public String sendChgPhoneReq(AppUserDto user) {
+        String code = sendUtil.generateCode();
+        String msg =  "인증번호: "+ code+"입니다.";
+        SendInfoEntity sendInfoEntity = sendUtil.generateKakaoSendInfo(msg,"CampusFlow", user.getPhone() );
+        sendInfoEntity.setReqSendTm(LocalDateTime.now());
+        sendInfoEntity =sendInfoRepository.save(sendInfoEntity);
+        //알림톡 DB Insert 추가 예정
+        sendInfoEntity.setSendStatus("SUCCESS");
+        return code;
+    }
+    public void verifyAndChangePhone(AppUserEntity user, PhoneVerifyDto phoneVerifyDto) {
+        if (!phoneVerifyDto.getInputCode().equals(phoneVerifyDto.getSentCode())) {
+            throw new IllegalArgumentException("인증번호가 일치하지 않습니다.");
+        }
+
+        AppUserEntity persistentUser = appUserRepository.findById(user.getAppUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+        persistentUser.setPhone(phoneVerifyDto.getPhone());
+        appUserRepository.save(persistentUser);
     }
 
 

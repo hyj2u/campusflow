@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -46,6 +48,18 @@ public class AppUserController {
     @GetMapping("/profile")
     public ResponseEntity<?>  getUserProfile(@AuthenticationPrincipal AppUserEntity userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(appUserService.getAppUserProfile(userDetails));
+    }
+
+    @PostMapping("/phone/req")
+    public ResponseEntity<?>  chgPhoneReq( @RequestBody AppUserDto appUserDto) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", appUserService.sendChgPhoneReq(appUserDto));
+        return ResponseEntity.status(HttpStatus.OK).body(data);
+    }
+    @PutMapping("/phone/verify")
+    public ResponseEntity<?>  chgPhoneReq(@AuthenticationPrincipal AppUserEntity appUser, @RequestBody PhoneVerifyDto phoneVerifyDto) {
+        appUserService.verifyAndChangePhone(appUser, phoneVerifyDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

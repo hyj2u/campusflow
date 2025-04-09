@@ -9,6 +9,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/order")
 @RequiredArgsConstructor
@@ -45,4 +48,18 @@ public class OrderController {
         orderService.deleteConsumerAddress(orderAddrId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+    @PostMapping
+    public ResponseEntity<CommonResponse<?>> addOrder( @RequestBody OrderRequestDto orderRequestDto) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("data", orderService.addOrder(orderRequestDto).getOrderId());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponse.of(data));
+
+    }
+  /*  @GetMapping("/history")
+    public ResponseEntity<CommonResponse<?>> getOrders(@AuthenticationPrincipal AppUserEntity appUser ) {
+
+
+    }*/
+
 }

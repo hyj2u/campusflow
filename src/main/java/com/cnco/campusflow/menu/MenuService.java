@@ -103,6 +103,34 @@ public class MenuService {
 
         return toFavoriteMenuDto(favoriteMenu);
     }
+    public MenuEntity addCartMenu(MenuRequestDto menuRequestDto) throws JsonProcessingException {
+        log.info(objectMapper.writeValueAsString(menuRequestDto));
+
+        List<MenuOptionEntity> options = buildMenuOptions(menuRequestDto);
+        ProductEntity product = productRepository.findById(menuRequestDto.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다. ID: " + menuRequestDto.getProductId()));
+
+        MenuEntity menu = new MenuEntity();
+        menu.setProduct(product);
+        menu.setStore(product.getStore());
+        menu.setOptions(options);
+        return  menuRepository.save(menu);
+    }
+    public void changeCartMenu(Long menuId, MenuRequestDto menuRequestDto) throws JsonProcessingException {
+        log.info(objectMapper.writeValueAsString(menuRequestDto));
+        MenuEntity menu = menuRepository.findById(menuId).get();
+        // 새 옵션을 빌드
+        List<MenuOptionEntity> options = buildMenuOptions(menuRequestDto);
+        // 기존 컬렉션 비우고, 새 옵션 추가
+        menu.getOptions().clear();
+        menu.getOptions().addAll(options);
+        menuRepository.save(menu);
+    }
+    public void deleteCartMenu(Long menuId) throws JsonProcessingException {
+        menuRepository.deleteById(menuId);
+    }
+
+
 
     public List<FavoriteMenuResponseDto> getFavoriteMenu(Long storeId, AppUserEntity appUser) {
         List<FavoriteMenuEntity> favoriteMenuEntities =

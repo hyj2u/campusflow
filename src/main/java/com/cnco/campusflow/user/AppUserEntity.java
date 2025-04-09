@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -66,7 +67,8 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "app_user_id") // timetable 테이블에 외래키 컬럼 생성
     private List<TimetableEntity> timetables;
-
+    @Column
+    private LocalDateTime lastLoginDt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
