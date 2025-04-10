@@ -51,15 +51,22 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<CommonResponse<?>> addOrder( @RequestBody OrderRequestDto orderRequestDto) {
         Map<String, Object> data = new HashMap<>();
-        data.put("data", orderService.addOrder(orderRequestDto).getOrderId());
+        data.put("orderId", orderService.addOrder(orderRequestDto).getOrderId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.of(data));
 
     }
-  /*  @GetMapping("/history")
+    @GetMapping("/{orderId}")
+    public ResponseEntity<CommonResponse<?>> getOrderDtl(@PathVariable Long orderId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(orderService.getOrder(orderId)));
+
+    }
+    @GetMapping("/history")
     public ResponseEntity<CommonResponse<?>> getOrders(@AuthenticationPrincipal AppUserEntity appUser ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(orderService.getOrderHistory(appUser)));
 
-
-    }*/
+    }
 
 }

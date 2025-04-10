@@ -7,17 +7,21 @@ import lombok.Data;
 
 import java.util.List;
 
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class OrderResponseDto {
 
     private Long orderId;
+
+
     private ConsumerResponseDto consumer;
+
     private List<MenuResponseDto> menus;
     private Integer totalPrice;
+    private String orderStatus;
 
-
+    private Long storeId;
+    private String storeName;
 
 }
 

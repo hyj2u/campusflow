@@ -3,7 +3,6 @@ package com.cnco.campusflow.order;
 
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.menu.MenuEntity;
-import com.cnco.campusflow.store.StoreEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -27,10 +26,6 @@ public class OrderEntity extends BaseEntity {
 
     private Integer totalPrice;
     private String orderStatus;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    private StoreEntity store;
 
 }
 
