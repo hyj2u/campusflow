@@ -33,5 +33,9 @@ public class ReplyEntity extends BaseEntity {
     @Column
     private Long upTreeId;
 
+    @Column
+    private Long blindYn;
 
+    @Column
+    private Long likeCnt;
 }
