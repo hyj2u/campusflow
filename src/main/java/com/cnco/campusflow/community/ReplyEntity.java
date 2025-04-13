@@ -38,4 +38,5 @@ public class ReplyEntity extends BaseEntity {
 
     @Column
     private Long likeCnt;
+
 }
