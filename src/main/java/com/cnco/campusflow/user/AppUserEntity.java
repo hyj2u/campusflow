@@ -40,8 +40,6 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
     @Column(unique = true)
     private String nickname;
 
-    @Column
-    private String enterYear;
     // College와 N:1 관계 (여러 유저가 하나의 대학에 속함)
     @Column
     private String major;
@@ -54,7 +52,7 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
     @Column
     private String phone;
     @Column
-    private String username;
+    private String appUserName;
     @Column
     private Date birthday;
     @ManyToOne
@@ -69,6 +67,8 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
     private List<TimetableEntity> timetables;
     @Column
     private LocalDateTime lastLoginDt;
+    @Column
+    private String collegeAdmissionYear;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

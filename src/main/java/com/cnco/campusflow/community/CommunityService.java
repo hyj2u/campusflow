@@ -169,7 +169,9 @@ public class CommunityService {
                         reply.getLevel(),
                         reply.getAppUser().getNickname(), // 작성자 닉네임 반환
                         reply.getInsertTimestamp(),
-                        reply.getReplyId()
+                        reply.getReplyId(),
+                        reply.getAppUser().getCollege().getCollegeName(),
+                        reply.getAppUser().getCollegeAdmissionYear()
                 ))
                 .collect(Collectors.toList());
     }

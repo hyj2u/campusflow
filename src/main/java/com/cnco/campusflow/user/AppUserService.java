@@ -51,10 +51,10 @@ public class AppUserService {
         user.setUserId(dto.getUserId());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setNickname(dto.getNickname());
-        user.setEnterYear(dto.getEnterYear());
+        user.setCollegeAdmissionYear(dto.getCollegeAdmissionYear());
         user.setMajor(dto.getMajor());
         user.setPhone(dto.getPhone());
-        user.setUsername(dto.getUsername());
+        user.setAppUserName(dto.getUsername());
         user.setBirthday(dto.getBirthday());
         user.setUserStatus("A");
         if(dto.getCollegeId() != null) {
