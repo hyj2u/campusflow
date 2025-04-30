@@ -146,7 +146,7 @@ public class AppUserService {
         dto.setAppUserId(user.getAppUserId());
         dto.setApproveStatus(user.getApproveStatus());
         if(user.getCollege()!=null){
-            dto.setEnterYear(user.getEnterYear());
+            dto.setCollegeAdmissionYear(user.getCollegeAdmissionYear());
             dto.setMajor(user.getMajor());
             dto.setCollegeId(user.getCollege().getCollegeId());
             dto.setCollegeName(user.getCollege().getCollegeName());
