@@ -11,7 +11,7 @@ public class AppUserProfileResponseDto {
     private Long appUserId;
     private String userId;
     private String nickname;
-    private String enterYear;
+    private String collegeAdmissionYear;
     private String major;
     private String phone;
     private String username;

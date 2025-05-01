@@ -20,4 +20,7 @@ public class ReplyResponseDto {
     private String nickname;
     private LocalDateTime insertTimestamp;
     private Long replyId;
+    private String collegeName;
+    private String collegeAdmissionYear;
+
 }
