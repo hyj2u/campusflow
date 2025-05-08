@@ -24,11 +24,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
-        //인증이 필요 없는 요청은 필터를 건너뜀
-        if (requestURI.equals("/user/signup") || requestURI.startsWith("/user/chk") || requestURI.equals("/user/login") || requestURI.equals("/user/refresh")) {
+        // Swagger UI 관련 경로는 필터를 건너뜀
+        if (requestURI.startsWith("/swagger-ui") || 
+            requestURI.startsWith("/v3/api-docs") || 
+            requestURI.startsWith("/swagger-resources") || 
+            requestURI.startsWith("/webjars")) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        //인증이 필요 없는 요청은 필터를 건너뜀
+        if (requestURI.equals("/user/signup") || 
+            requestURI.startsWith("/user/chk") || 
+            requestURI.equals("/user/login") || 
+            requestURI.equals("/user/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {

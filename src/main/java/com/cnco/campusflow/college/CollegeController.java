@@ -7,6 +7,10 @@ import com.cnco.campusflow.community.ReplyRequestDto;
 import com.cnco.campusflow.community.ReportDto;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -22,10 +26,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/college")
 @RequiredArgsConstructor
+@Tag(name = "College", description = "College management APIs")
 public class CollegeController {
     private final CollegeService collegeService;
 
-
+    @Operation(summary = "Get colleges", description = "Retrieves the list of colleges.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Colleges retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
     @GetMapping
     public ResponseEntity<?> getColleges() {
         return ResponseEntity.status(HttpStatus.OK)
