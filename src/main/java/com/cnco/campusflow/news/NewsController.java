@@ -18,14 +18,30 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/news")
 @RequiredArgsConstructor
-@Tag(name = "News", description = "News management APIs")
+@Tag(
+    name = "News",
+    description = """
+        뉴스 관리 API
+        
+        * 오늘의 뉴스 정보를 조회하는 기능을 제공합니다.
+        * 활성화된 뉴스 URL을 반환합니다.
+        """
+)
 public class NewsController {
     private final NewsService newsService;
 
-    @Operation(summary = "Get today's news", description = "Retrieves the news for today.")
+    @Operation(
+        summary = "오늘의 뉴스 조회",
+        description = """
+            오늘의 뉴스 정보를 조회합니다.
+            
+            * 활성화된 뉴스 URL을 반환합니다.
+            * 뉴스 정보는 관리자 페이지에서 관리됩니다.
+            """
+    )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Today's news retrieved successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input")
+        @ApiResponse(responseCode = "200", description = "뉴스 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 입력값")
     })
     @GetMapping
     public ResponseEntity<CommonResponse<?>> getTodayNews() {

@@ -8,8 +8,12 @@ import com.cnco.campusflow.community.ReportDto;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -26,20 +30,41 @@ import java.util.List;
 @RestController
 @RequestMapping("/college")
 @RequiredArgsConstructor
-@Tag(name = "College", description = "College management APIs")
+@Tag(
+    name = "College",
+    description = """
+        대학 관리 API
+        
+        * 대학 목록 조회
+        * 대학 정보 관리
+        
+        대부분의 API는 JWT 인증이 필요합니다.
+        """
+)
+@SecurityRequirement(name = "bearerAuth")
 public class CollegeController {
     private final CollegeService collegeService;
 
-    @Operation(summary = "Get colleges", description = "Retrieves the list of colleges.")
+    @Operation(
+        summary = "대학 목록 조회",
+        description = """
+            등록된 모든 대학의 목록을 조회합니다.
+            
+            * 대학 ID, 코드, 이름 정보가 포함됩니다.
+            * 생성/수정 시간이 포함됩니다.
+            """
+    )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Colleges retrieved successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input")
+        @ApiResponse(
+            responseCode = "200",
+            description = "대학 목록 조회 성공",
+            content = @Content(schema = @Schema(implementation = CollegeEntity.class))
+        ),
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 접근")
     })
     @GetMapping
     public ResponseEntity<?> getColleges() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(collegeService.getColleges()));
     }
-
-
 }
