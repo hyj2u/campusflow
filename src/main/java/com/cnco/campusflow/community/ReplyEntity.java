@@ -35,9 +35,7 @@ import lombok.Data;
                 "nickname": "작성자"
             },
             "level": 0,
-            "upTreeId": null,
-            "insertTimestamp": "2024-03-20T10:00:00",
-            "updateTimestamp": "2024-03-20T10:00:00"
+            "upTreeId": null
         }
         """
 )

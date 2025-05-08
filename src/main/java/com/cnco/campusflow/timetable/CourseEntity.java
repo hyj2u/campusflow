@@ -81,18 +81,30 @@ public class CourseEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "course_id"),  // LectureEntity를 참조하는 외래키
             inverseJoinColumns = @JoinColumn(name = "code_id") // CodeEntity를 참조하는 외래키
     )
-    @Schema(description = "강의 요일 목록", example = """
-        [
-            {
-                "codeId": 1,
-                "codeNm": "월요일"
-            },
-            {
-                "codeId": 3,
-                "codeNm": "수요일"
-            }
-        ]
-        """)
+    @Schema(
+        description = """
+            강의 요일 목록
+            
+            * MON: 월요일
+            * TUE: 화요일
+            * WED: 수요일
+            * THU: 목요일
+            * FRI: 금요일
+            """,
+        example = """
+            [
+                {
+                    "codeCd": "MON",
+                    "codeNm": "월"
+                },
+                {
+                    "codeCd": "WED",
+                    "codeNm": "수"
+                }
+            ]
+            """,
+        allowableValues = {"MON", "TUE", "WED", "THU", "FRI"}
+    )
     private List<CodeEntity> days;
 }
 

@@ -57,7 +57,7 @@ public class OrderEntity extends BaseEntity {
         {
             "consumerId": 1,
             "name": "홍길동",
-            "phone": "010-1234-5678"
+            "phone": "01012345678"
         }
         """)
     private ConsumerEntity consumer;
@@ -79,7 +79,19 @@ public class OrderEntity extends BaseEntity {
     @Schema(description = "주문 총 가격", example = "4500")
     private Integer totalPrice;
 
-    @Schema(description = "주문 상태", example = "ORDERED", allowableValues = {"ORDERED", "PREPARING", "READY", "COMPLETED", "CANCELLED"})
+    @Schema(
+        description = """
+            주문 상태
+            
+            * ORDERED: 주문이 접수된 상태
+            * PREPARING: 매장에서 주문을 준비 중인 상태
+            * READY: 주문 준비가 완료된 상태
+            * COMPLETED: 주문이 완료된 상태
+            * CANCELLED: 주문이 취소된 상태
+            """,
+        example = "ORDERED",
+        allowableValues = {"ORDERED", "PREPARING", "READY", "COMPLETED", "CANCELLED"}
+    )
     private String orderStatus;
 }
 

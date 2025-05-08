@@ -32,8 +32,8 @@ import java.util.List;
             "viewCnt": 0,
             "secretYn": "N",
             "boardType": {
-                "codeCd": "NOTICE",
-                "codeNm": "공지사항"
+                "codeCd": "free",
+                "codeNm": "FREE_BOARD"
             },
             "appUser": {
                 "appUserId": 1,
@@ -74,13 +74,32 @@ public class CommunityBoardEntity extends BaseEntity {
     @Column
     @Schema(description = "비밀글 여부 (Y/N)", example = "N")
     private String secretYn;    // 비밀글여부
+
     @ManyToOne
     @JoinColumn(name="code_cd")
-    @Schema(description = "게시글 유형")
+    @Schema(
+        description = """
+            게시글 유형
+            
+            가능한 값:
+            * free - FREE_BOARD (자유게시판)
+            * qna - QA_BOARD (Q&A 게시판)
+            * franchise - FRCHI_BOARD (가맹점 게시판)
+            * member - MEMBR_BOARD (회원 게시판)
+            * error - ERROR_BOARD (오류 게시판)
+            * event - EVENT_BOARD (이벤트 게시판)
+            """,
+        example = """
+            {
+                "codeCd": "free",
+                "codeNm": "FREE_BOARD"
+            }
+            """
+    )
     private CodeEntity boardType;
+
     @OneToMany( cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "board_id")
     @Schema(description = "첨부된 이미지 목록")
     private List<ImageEntity> images; // 1:N 관계
-
 }
