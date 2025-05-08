@@ -20,7 +20,7 @@ import java.util.List;
         {
             "courseId": 1,
             "courseName": "자바 프로그래밍",
-            "days": ["월요일", "수요일"],
+            "days": ["MON", "WED"],
             "location": "A101",
             "startTime": "09:00",
             "endTime": "10:30",
@@ -37,7 +37,7 @@ public class CourseDto {
     @Schema(description = "강의명", example = "자바 프로그래밍")
     private String courseName;
 
-    @Schema(description = "강의 요일 목록", example = "[\"월요일\", \"수요일\"]")
+    @Schema(description = "강의 요일 목록", example = "[\"MON\", \"WED\"]")
     private List<String> days;
 
     @Schema(description = "강의실", example = "A101")
