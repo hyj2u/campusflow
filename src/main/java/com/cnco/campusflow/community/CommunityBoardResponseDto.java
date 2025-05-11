@@ -66,6 +66,13 @@ public class CommunityBoardResponseDto {
     @Schema(description = "조회수", example = "10")
     private Integer viewCnt;
 
+    @Schema(description = "좋아요수", example = "10")
+    private Integer likeCnt;
+    @Schema(description = "댓글 수 ", example = "10")
+    private Integer replyCnt;
+    @Schema(description = "작성자 프로필이미지 ", example = "10")
+    private String profileImgUrl;
+
     @Schema(description = "작성자 ID", example = "1")
     private Long appUserId;
 

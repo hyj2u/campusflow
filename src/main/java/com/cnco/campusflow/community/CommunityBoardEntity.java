@@ -70,6 +70,9 @@ public class CommunityBoardEntity extends BaseEntity {
     @Column
     @Schema(description = "조회수", example = "0")
     private Integer viewCnt;    // 조회(수)
+    @Column
+    @Schema(description = "좋아요수", example = "0")
+    private Integer likeCnt;    // 조회(수)
 
     @Column
     @Schema(description = "비밀글 여부 (Y/N)", example = "N")
