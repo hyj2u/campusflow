@@ -31,16 +31,7 @@ import java.util.List;
             "location": "A101",
             "professor": "홍길동",
             "color": "#FF0000",
-            "days": [
-                {
-                    "codeId": 1,
-                    "codeNm": "월요일"
-                },
-                {
-                    "codeId": 3,
-                    "codeNm": "수요일"
-                }
-            ]
+            "days": [ "MON", "WED" ]
         }
         """
 )
@@ -92,15 +83,7 @@ public class CourseEntity extends BaseEntity {
             * FRI: 금요일
             """,
         example = """
-            [
-                {
-                    "codeCd": "MON",
-                    "codeNm": "월"
-                },
-                {
-                    "codeCd": "WED",
-                    "codeNm": "수"
-                }
+            [ "MON", "WED" ]
             ]
             """,
         allowableValues = {"MON", "TUE", "WED", "THU", "FRI"}

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/time")
@@ -120,6 +121,12 @@ public class TimeTableController {
             
             * 시간표 ID가 필요합니다.
             * 요일별 필터링이 가능합니다.
+            * day 파라미터는 선택사항이며, 다음 값만 사용 가능합니다:
+              - MON: 월요일
+              - TUE: 화요일
+              - WED: 수요일
+              - THU: 목요일
+              - FRI: 금요일
             """
     )
     @ApiResponses(value = {
@@ -128,8 +135,27 @@ public class TimeTableController {
     })
     @GetMapping("/{tmTableId}")
     public ResponseEntity<CommonResponse<?>> getTimeTableDtl(
-        @Parameter(description = "시간표 번호") @PathVariable Long tmTableId,
-        @Parameter(description = "요일") @RequestParam(required = false) String day
+        @Parameter(
+            description = "시간표 번호",
+            example = "1"
+        ) 
+        @PathVariable Long tmTableId,
+        @Parameter(
+            description = """
+                요일 (선택사항)
+                
+                * MON: 월요일
+                * TUE: 화요일
+                * WED: 수요일
+                * THU: 목요일
+                * FRI: 금요일
+                """,
+            example = "MON",
+            schema = @Schema(
+                allowableValues = {"MON", "TUE", "WED", "THU", "FRI"}
+            )
+        ) 
+        @RequestParam(required = false) String day
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(timeTableService.getTimeTableDtl(tmTableId, day)));
