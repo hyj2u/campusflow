@@ -2,7 +2,6 @@ package com.cnco.campusflow.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -17,20 +16,22 @@ import lombok.Data;
         """,
     example = """
         {
-            "userId": "user123",
-            "password": "encrypted_password"
+            "userId": "test",
+            "password": "test1234!!",
+            "deviceInfo": "deviceInfo",
+            "fcmToken": "fcmToken"
         }
         """
 )
 public class LoginRequestDto {
-    @NotBlank(message = "아이디는 필수 입력값입니다.")
+
     @Schema(description = "로그인 아이디", example = "user123", required = true)
     private String userId;
 
-    @NotBlank(message = "비밀번호는 필수 입력값입니다.")
-    @Schema(description = "비밀번호 (암호화)", example = "encrypted_password", required = true)
+    @Schema(description = "비밀번호", example = "password", required = true)
     private String password;
-
+    @Schema(description = "디바이스정보", example = "IOS 15", required = true)
     private String deviceInfo;
+    @Schema(description = "FCM 토큰 (PUSH)", example = "fionienocs", required = true)
     private String fcmToken;
 }
