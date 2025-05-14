@@ -3,7 +3,6 @@ package com.cnco.campusflow.menu;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.product.ProductEntity;
 import com.cnco.campusflow.store.StoreEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "menu", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     name = "MenuEntity",

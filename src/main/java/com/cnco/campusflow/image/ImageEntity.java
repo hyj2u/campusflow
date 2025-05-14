@@ -1,15 +1,12 @@
 package com.cnco.campusflow.image;
 
-import com.cnco.campusflow.common.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "image", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     name = "ImageEntity",

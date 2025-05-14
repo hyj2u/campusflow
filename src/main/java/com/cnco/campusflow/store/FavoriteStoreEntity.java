@@ -2,14 +2,13 @@ package com.cnco.campusflow.store;
 
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.user.AppUserEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "favorite_store", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     name = "FavoriteStoreEntity",

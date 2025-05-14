@@ -3,9 +3,7 @@ package com.cnco.campusflow.user;
 import com.cnco.campusflow.college.CollegeEntity;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.image.ImageEntity;
-import com.cnco.campusflow.store.StoreEntity;
 import com.cnco.campusflow.timetable.TimetableEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -27,7 +25,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name = "app_user", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(
     name = "AppUserEntity",
     description = """

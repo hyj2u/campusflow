@@ -1,10 +1,9 @@
 package com.cnco.campusflow.optgrp;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OptGrpHqRequestDto {
     private Long optGrpId;
     private String optGrpNm;   // 옵션 그룹 이름

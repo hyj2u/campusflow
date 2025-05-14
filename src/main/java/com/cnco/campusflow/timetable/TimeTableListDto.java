@@ -1,11 +1,10 @@
 package com.cnco.campusflow.timetable;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(
     name = "TimeTableListDto",
     description = """

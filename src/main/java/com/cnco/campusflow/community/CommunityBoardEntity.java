@@ -4,7 +4,6 @@ import com.cnco.campusflow.code.CodeEntity;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.image.ImageEntity;
 import com.cnco.campusflow.user.AppUserEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "community_board", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     name = "CommunityBoardEntity",

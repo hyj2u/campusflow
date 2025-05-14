@@ -2,14 +2,13 @@ package com.cnco.campusflow.community;
 
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.user.AppUserEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "board_report", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     name = "ReportEntity",
@@ -43,10 +42,14 @@ public class ReportEntity extends BaseEntity {
     private Long reportId;
 
     @ManyToOne
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_id")
     @Schema(description = "신고된 게시글 정보")
     private CommunityBoardEntity board;
 
+    @ManyToOne
+    @JoinColumn(name = "reply_id")
+    @Schema(description = "신고된 댓글 정보")
+    private ReplyEntity reply;
     @Column
     @Schema(description = "신고 사유", example = "부적절한 내용")
     private String reason;

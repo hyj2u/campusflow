@@ -1,14 +1,13 @@
 package com.cnco.campusflow.brand;
 
 import com.cnco.campusflow.common.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "brand", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     description = "브랜드 엔티티",

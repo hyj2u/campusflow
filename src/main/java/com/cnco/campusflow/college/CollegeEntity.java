@@ -1,7 +1,6 @@
 package com.cnco.campusflow.college;
 
 import com.cnco.campusflow.common.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "college", schema = "admin")
 @Schema(
     name = "CollegeEntity",

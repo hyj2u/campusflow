@@ -1,17 +1,14 @@
 package com.cnco.campusflow.community;
 
-import com.cnco.campusflow.code.CodeEntity;
-import com.cnco.campusflow.college.CollegeEntity;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.user.AppUserEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "reply", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     name = "ReplyEntity",

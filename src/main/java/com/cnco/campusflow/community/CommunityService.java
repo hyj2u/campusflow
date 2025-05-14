@@ -87,7 +87,12 @@ public class CommunityService {
     public Long reportBoard(ReportDto reportDto, AppUserEntity appUser) {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setReason(reportDto.getReason());
-        reportEntity.setBoard(communityBoardRepository.findById(reportDto.getBoardId()).get());
+        if(reportDto.getBoardId() != null) {
+            reportEntity.setBoard(communityBoardRepository.findById(reportDto.getBoardId()).get());
+        }
+        if(reportDto.getReplyId() != null) {
+            reportEntity.setReply(replyRepository.findById(reportDto.getReplyId()).get());
+        }
         reportEntity.setAppUser(appUser);
         return reportRepository.save(reportEntity).getReportId();
     }

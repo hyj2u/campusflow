@@ -3,7 +3,6 @@ package com.cnco.campusflow.store;
 import com.cnco.campusflow.brand.BrandEntity;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.image.ImageEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "store", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Schema(
     name = "StoreEntity",

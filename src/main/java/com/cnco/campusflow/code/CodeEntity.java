@@ -2,13 +2,12 @@ package com.cnco.campusflow.code;
 
 
 import com.cnco.campusflow.common.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "code", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class CodeEntity extends BaseEntity {
     @Id

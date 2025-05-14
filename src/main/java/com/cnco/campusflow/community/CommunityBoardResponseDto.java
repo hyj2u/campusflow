@@ -1,7 +1,6 @@
 package com.cnco.campusflow.community;
 
 import com.cnco.campusflow.image.ImageResponseDto;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -9,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(
     name = "CommunityBoardResponseDto",
     description = """
