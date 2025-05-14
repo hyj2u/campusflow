@@ -24,9 +24,9 @@ import lombok.Data;
 )
 public class ReportDto {
 
-    @Schema(description = "신고할 게시글 번호", example = "1", required = true)
+    @Schema(description = "신고할 게시글 번호", example = "1")
     private Long boardId;
-    @Schema(description = "신고할 댓글 번호", example = "1", required = true)
+    @Schema(description = "신고할 댓글 번호", example = "1")
     private Long replyId;
 
     @Schema(description = "신고 사유", example = "부적절한 내용", required = true)

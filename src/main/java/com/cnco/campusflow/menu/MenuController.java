@@ -75,7 +75,7 @@ public class MenuController {
     })
     @GetMapping("/{categoryId}")
     public ResponseEntity<CommonResponse<?>> getMenus(
-        @Parameter(description = "카테고리 번호", example = "1") @PathVariable Long categoryId
+        @Parameter(description = "카테고리 번호", example = "24") @PathVariable Long categoryId
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(menuService.getMenus(categoryId)));
@@ -144,7 +144,7 @@ public class MenuController {
     @GetMapping("/favorite/{storeId}")
     public ResponseEntity<?> getFavoriteMenu(
         @Parameter(description = "인증된 사용자 정보") @AuthenticationPrincipal AppUserEntity appUser,
-        @Parameter(description = "매장 번호", example = "1") @PathVariable Long storeId
+        @Parameter(description = "매장 번호", example = "42") @PathVariable Long storeId
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(menuService.getFavoriteMenu(storeId, appUser)));

@@ -1,5 +1,6 @@
 package com.cnco.campusflow.common;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,15 @@ public class GlobalExceptionHandler {
                 .body(ErrorRespDto.builder()
                         .msg("An unexpected error occurred")
                         .errorCode("S001")
+                        .build());
+    }
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorRespDto> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorRespDto.builder()
+                        .msg(ex.getMessage())
+                        .errorCode("C004")
                         .build());
     }
 }

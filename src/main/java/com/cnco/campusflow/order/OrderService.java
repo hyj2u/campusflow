@@ -6,6 +6,7 @@ import com.cnco.campusflow.menu.MenuRepository;
 import com.cnco.campusflow.menu.MenuResponseDto;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.user.AppUserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,6 +98,11 @@ public class OrderService {
             consumerEntity.setOrderAddress(null);
             consumerRepository.save(consumerEntity);
         }
+        if (orderAddressRepository.existsById(orderAddressId)) {
+            orderAddressRepository.deleteById(orderAddressId);
+        } else {
+            throw new EntityNotFoundException("OrderAddress not found with id: " + orderAddressId);
+        }
         orderAddressRepository.deleteById(orderAddressId);
     }
 
@@ -136,6 +142,8 @@ public class OrderService {
         dto.setAddressMain(consumer.getOrderAddress().getAddressMain());
         dto.setAddressDtl(consumer.getOrderAddress().getAddressDtl());
         dto.setPhone(user.getPhone());
+        dto.setDefaultYn(consumer.getOrderAddress().getDefaultYn());
+        dto.setOrderAddrId(consumer.getOrderAddress().getOrderAddrId());
         return dto;
     }
 

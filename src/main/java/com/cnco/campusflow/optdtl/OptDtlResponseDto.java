@@ -26,6 +26,7 @@ public class OptDtlResponseDto {
     private String type;
 
     private Integer unitPrice;
+    private String dtlUseYn;
 
 
 

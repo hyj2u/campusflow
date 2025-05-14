@@ -267,7 +267,7 @@ public class MenuService {
         dto.setOptionId(option.getOptionId());
         dto.setOptionNm(option.getOptionNm());
         dto.setCodeNm(option.getCode().getCodeNm());
-
+        dto.setRequireYn(option.getRequireYn());
         List<OptDtlResponseDto> details = option.getOptions().stream()
                 .map(dtl -> {
                     OptDtlResponseDto d = new OptDtlResponseDto();
@@ -278,6 +278,7 @@ public class MenuService {
                     d.setMin(dtl.getMin());
                     d.setMax(dtl.getMax());
                     d.setUnitPrice(dtl.getUnitPrice());
+                    d.setDtlUseYn(dtl.getDtlUseYn());
                     return d;
                 })
                 .collect(Collectors.toList());
