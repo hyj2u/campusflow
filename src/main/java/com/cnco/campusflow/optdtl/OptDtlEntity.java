@@ -34,7 +34,7 @@ public class OptDtlEntity extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private StoreEntity store;
     @ManyToOne
-    @JoinColumn( name = "opt_dtl_hq_id", nullable = false)
+    @JoinColumn( name = "opt_dtl_hq_id")
     private OptDtlHqEntity optDtlHqEntity;
 
 

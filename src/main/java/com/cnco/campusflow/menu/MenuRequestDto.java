@@ -25,10 +25,10 @@ import java.util.List;
                     "productId": 60,
                     "options": [
                         {
-                            "optionId": 127,
-                            "optDtlId": 350,
-                            "chosenNum": 1,
-                            "totalPrice": 500
+                            "optionId": 129,
+                            "optDtlId": 355,
+                            "chosenNum": 2,
+                            "totalPrice": 0
                         }
                     ]
                 }

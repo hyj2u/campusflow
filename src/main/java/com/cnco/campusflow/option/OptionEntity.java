@@ -8,6 +8,8 @@ import com.cnco.campusflow.optgrp.OptGrpEntity;
 import com.cnco.campusflow.store.StoreEntity;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.util.List;
 
@@ -38,7 +40,8 @@ public class OptionEntity extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private StoreEntity store;
     @ManyToOne
-    @JoinColumn( name = "option_hq_id", nullable = false)
+    @JoinColumn( name = "option_hq_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private OptionHqEntity optionHq;
 
 
