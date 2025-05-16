@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -83,7 +84,7 @@ public class StoreController {
     @GetMapping("/favorite")
     public PaginatedResponse<StoreListDto> getMyStores(
         @Parameter(description = "인증된 사용자 정보") @AuthenticationPrincipal AppUserEntity user,
-        @PageableDefault(size = 10) Pageable pageable
+        @ParameterObject  @PageableDefault(size = 10) Pageable pageable
     ) {
         Page<StoreListDto> page = storeService.getMyStores(user, pageable);
         return new PaginatedResponse<>(
@@ -112,7 +113,7 @@ public class StoreController {
     @PostMapping("/favorite/{storeId}")
     public ResponseEntity<CommonResponse<?>> addFavoriteStore(
         @Parameter(description = "인증된 사용자 정보") @AuthenticationPrincipal AppUserEntity appUser,
-        @Parameter(description = "매장 번호", example = "1") @PathVariable Long storeId
+        @Parameter(description = "매장 번호", example = "15") @PathVariable Long storeId
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.of(storeService.addFavoriteStore(appUser, storeId)));

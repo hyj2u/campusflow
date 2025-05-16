@@ -8,4 +8,5 @@ public interface FavoriteStoreRepository extends JpaRepository<FavoriteStoreEnti
 
     void deleteByUserAppUserIdAndStoreStoreId(Long userAppUserId, Long storeId);
     Page<FavoriteStoreEntity> findFavoriteStoreEntitiesByUserAppUserId(Long userAppUserId, Pageable pageable);
+    boolean existsByUserAppUserIdAndStoreStoreId(Long userId, Long storeId);
 }
