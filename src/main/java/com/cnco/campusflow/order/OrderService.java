@@ -27,12 +27,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     public ConsumerResponseDto addConsumerInfo(AppUserEntity appUser, ConsumerRequestDto consumerRequestDto) {
-        ConsumerEntity consumerEntity = consumerRequestDto.getConsumerId() != null
-                ? consumerRepository.findById(consumerRequestDto.getConsumerId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 consumerId: " + consumerRequestDto.getConsumerId()))
-                : new ConsumerEntity();
-
-        consumerEntity.setAppUser(appUser);
+        ConsumerEntity consumerEntity;
+        if(consumerRepository.findById(consumerRequestDto.getConsumerId()).isPresent()) {
+                consumerEntity = consumerRepository.findById(consumerRequestDto.getConsumerId()).get();
+        }else{
+            consumerEntity = new ConsumerEntity();
+            consumerEntity.setAppUser(appUser);
+        }
         consumerEntity.setDeliveryDemand(consumerRequestDto.getDeliveryDemand());
         consumerEntity.setStoreDemand(consumerRequestDto.getStoreDemand());
         consumerEntity.setOrderAddress(orderAddressRepository.findById(consumerRequestDto.getOrderAddrId())

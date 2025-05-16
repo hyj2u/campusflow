@@ -15,7 +15,6 @@ import lombok.Data;
         """,
     example = """
         {
-            "orderAddrId": 1,
             "addressMain": "서울시 강남구",
             "addressDtl": "123-45",
             "defaultYn": "Y"
