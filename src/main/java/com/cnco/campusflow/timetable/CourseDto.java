@@ -14,10 +14,11 @@ import java.util.List;
         
         * 강의 생성/수정 시 사용되는 DTO입니다.
         * 강의의 기본 정보(번호, 이름, 요일, 장소, 시간, 교수, 색상)와 시간표 번호를 포함합니다.
+        * coudseId 가 있으면 생성, 없으면 수정
         """,
     example = """
         {
-            "courseId": 1,
+           
             "courseName": "자바 프로그래밍",
             "days": ["MON", "WED"],
             "location": "A101",
