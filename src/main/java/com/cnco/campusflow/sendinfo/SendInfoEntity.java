@@ -2,7 +2,6 @@ package com.cnco.campusflow.sendinfo;
 
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.user.AppUserEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "send_info", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class SendInfoEntity extends BaseEntity {
     @Id

@@ -6,7 +6,6 @@ import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.image.ImageEntity;
 import com.cnco.campusflow.optgrp.OptGrpHqEntity;
 import com.cnco.campusflow.option.OptionHqEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,7 +15,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "product_hq", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class ProductHqEntity extends BaseEntity {
     @Id

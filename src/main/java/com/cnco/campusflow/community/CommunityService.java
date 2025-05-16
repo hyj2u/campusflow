@@ -51,6 +51,7 @@ public class CommunityService {
         boardEntity.setAppUser(appUser);
         boardEntity.setSecretYn(board.getSecretYn());
         boardEntity.setViewCnt(0);
+        boardEntity.setLikeCnt(0);
         boardEntity.setBoardType(codeRepository.findByCodeCd(board.getType()));
 
         if (images != null) {
@@ -86,7 +87,12 @@ public class CommunityService {
     public Long reportBoard(ReportDto reportDto, AppUserEntity appUser) {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setReason(reportDto.getReason());
-        reportEntity.setBoard(communityBoardRepository.findById(reportDto.getBoardId()).get());
+        if(reportDto.getBoardId() != null) {
+            reportEntity.setBoard(communityBoardRepository.findById(reportDto.getBoardId()).get());
+        }
+        if(reportDto.getReplyId() != null) {
+            reportEntity.setReply(replyRepository.findById(reportDto.getReplyId()).get());
+        }
         reportEntity.setAppUser(appUser);
         return reportRepository.save(reportEntity).getReportId();
     }
@@ -202,6 +208,12 @@ public class CommunityService {
             }
             dto.setImages(imageEntities);
         }
+        dto.setLikeCnt(boardEntity.getLikeCnt());
+        dto.setReplyCnt(replyRepository.findAllByBoardBoardIdOrderByInsertTimestampAsc(boardEntity.getBoardId()).size());
+        if(boardEntity.getAppUser().getProfileImg() != null) {
+            dto.setProfileImgUrl(imageBaseUrl+"/"+boardEntity.getAppUser().getProfileImg().getImageId());
+        }
+
         return dto;
     }
 }

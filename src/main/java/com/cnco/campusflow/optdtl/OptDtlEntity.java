@@ -2,13 +2,12 @@ package com.cnco.campusflow.optdtl;
 
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.store.StoreEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "opt_dtl", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class OptDtlEntity extends BaseEntity {
     @Id

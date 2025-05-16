@@ -6,7 +6,6 @@ import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.optdtl.OptDtlEntity;
 import com.cnco.campusflow.optgrp.OptGrpEntity;
 import com.cnco.campusflow.store.StoreEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "option", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class OptionEntity extends BaseEntity {
     @Id

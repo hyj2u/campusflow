@@ -4,13 +4,12 @@ package com.cnco.campusflow.optgrp;
 import com.cnco.campusflow.brand.BrandEntity;
 import com.cnco.campusflow.common.BaseEntity;
 import com.cnco.campusflow.store.StoreEntity;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "opt_grp", schema = "admin")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class OptGrpEntity extends BaseEntity {
     @Id
