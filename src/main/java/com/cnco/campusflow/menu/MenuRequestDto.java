@@ -30,7 +30,8 @@ import java.util.List;
                             "chosenNum": 2,
                             "totalPrice": 0
                         }
-                    ]
+                    ],
+                    "orderCnt": 1,
                 }
                 """
 )
@@ -49,4 +50,6 @@ public class MenuRequestDto {
             ]
             """)
     private List<MenuOptionRequestDto> options;
+    @Schema(description = "주문 수량", example = "1")
+    private Integer orderCnt;
 }

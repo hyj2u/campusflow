@@ -38,6 +38,8 @@ import java.util.List;
 public class MenuResponseDto {
     @Schema(description = "메뉴 번호", example = "1")
     private Long menuId;
+    @Schema(description = "주문 수량", example = "1")
+    private Integer orderCnt;
 
     @Schema(description = "매장 번호", example = "1")
     private Long storeId;

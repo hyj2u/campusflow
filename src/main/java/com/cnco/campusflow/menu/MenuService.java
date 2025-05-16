@@ -117,6 +117,7 @@ public class MenuService {
         menu.setProduct(product);
         menu.setStore(product.getStore());
         menu.setOptions(options);
+        menu.setOrderCnt(menuRequestDto.getOrderCnt());
         MenuEntity menuEntity = menuRepository.save(menu);
         CartEntity cart;
         if (cartRepository.findByAppUser(appUser) != null) {
@@ -149,6 +150,7 @@ public class MenuService {
         // 기존 컬렉션 비우고, 새 옵션 추가
         menu.getOptions().clear();
         menu.getOptions().addAll(options);
+        menu.setOrderCnt(menuRequestDto.getOrderCnt());
         menuRepository.save(menu);
     }
 
@@ -329,7 +331,7 @@ public class MenuService {
                     menuDto.setStoreName(menu.getStore().getStoreNm());
                     menuDto.setProductId(menu.getProduct().getProductId());
                     menuDto.setProductName(menu.getProduct().getProductNm());
-
+                    menuDto.setOrderCnt(menu.getOrderCnt());
                     List<MenuOptionDto> optionDtos = menu.getOptions().stream()
                             .map(this::toMenuOptionDto)
                             .collect(Collectors.toList());

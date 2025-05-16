@@ -162,6 +162,7 @@ public class OrderService {
         dto.setTotalPrice(order.getTotalPrice());
         dto.setOrderStatus(order.getOrderStatus());
 
+
         ConsumerResponseDto consumerDto = new ConsumerResponseDto();
         consumerDto.setConsumerId(order.getConsumer().getConsumerId());
         consumerDto.setPhone(order.getConsumer().getAppUser().getPhone());
@@ -179,7 +180,7 @@ public class OrderService {
             menuDto.setProductName(menu.getProduct().getProductNm());
             menuDto.setStoreId(menu.getStore().getStoreId());
             menuDto.setStoreName(menu.getStore().getStoreNm());
-
+            menuDto.setOrderCnt(menu.getOrderCnt());
             List<MenuOptionDto> optionDtos = menu.getOptions().stream().map(option -> {
                 MenuOptionDto optDto = new MenuOptionDto();
                 optDto.setOptionId(option.getOptionEntity().getOptionId());

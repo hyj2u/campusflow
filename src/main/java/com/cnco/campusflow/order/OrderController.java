@@ -146,7 +146,7 @@ public class OrderController {
     }
 
     @Operation(
-        summary = "주문 생성",
+        summary = "주문하기",
         description = """
             새로운 주문을 생성합니다.
             
