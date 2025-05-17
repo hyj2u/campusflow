@@ -18,4 +18,5 @@ public class CsCenterReplyResponseDto {
     private Long replyId;
     private String deleteYn;
     private String blindYn;
+    private String helpfulYn;
 } 

@@ -39,4 +39,7 @@ public class CsCenterReplyEntity extends BaseEntity {
 
     @Column
     private String blindYn;
+
+    @Column
+    private String helpfulYn;
 } 

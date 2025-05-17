@@ -19,6 +19,7 @@ import java.util.List;
 public class CsCenterBoardController {
 
     private final CsCenterBoardService csCenterBoardService;
+    private final CsCenterReplyService csCenterReplyService;
 
     @PostMapping
     public ResponseEntity<CsCenterBoardResponseDto> createBoard(
@@ -59,5 +60,49 @@ public class CsCenterBoardController {
             @AuthenticationPrincipal AppUserEntity appUser,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(csCenterBoardService.getMyBoards(appUser.getAppUserId(), pageable));
+    }
+
+    // 댓글 작성
+    @PostMapping("/{boardId}/reply")
+    public ResponseEntity<CsCenterReplyResponseDto> addReply(
+            @PathVariable Long boardId,
+            @RequestBody CsCenterReplyRequestDto dto,
+            @AuthenticationPrincipal AppUserEntity user) {
+        return ResponseEntity.ok(csCenterReplyService.addReply(boardId, dto, user));
+    }
+
+    // 댓글 수정
+    @PutMapping("/reply/{replyId}")
+    public ResponseEntity<CsCenterReplyResponseDto> updateReply(
+            @PathVariable Long replyId,
+            @RequestBody CsCenterReplyRequestDto dto,
+            @AuthenticationPrincipal AppUserEntity user) {
+        return ResponseEntity.ok(csCenterReplyService.updateReply(replyId, dto, user));
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/reply/{replyId}")
+    public ResponseEntity<Void> deleteReply(
+            @PathVariable Long replyId,
+            @AuthenticationPrincipal AppUserEntity user) {
+        csCenterReplyService.deleteReply(replyId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    // 댓글 목록 조회
+    @GetMapping("/{boardId}/reply")
+    public ResponseEntity<List<CsCenterReplyResponseDto>> getReplies(
+            @PathVariable Long boardId,
+            @RequestParam(defaultValue = "DESC") String order) {
+        return ResponseEntity.ok(csCenterReplyService.getReplies(boardId, order));
+    }
+
+    // 댓글 도움이 되었나요(Y/N)
+    @PutMapping("/reply/{replyId}/helpful")
+    public ResponseEntity<CsCenterReplyResponseDto> setHelpfulYn(
+            @PathVariable Long replyId,
+            @RequestParam String helpfulYn,
+            @AuthenticationPrincipal AppUserEntity user) {
+        return ResponseEntity.ok(csCenterReplyService.setHelpfulYn(replyId, helpfulYn, user));
     }
 } 
