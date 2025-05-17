@@ -2,6 +2,7 @@ package com.cnco.campusflow.image;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,10 +25,14 @@ import lombok.NoArgsConstructor;
         }
         """
 )
+@Builder
 public class ImageResponseDto {
     @Schema(description = "이미지 번호", example = "1")
     private Long imageId;
 
     @Schema(description = "이미지 접근 URL", example = "https://example.com/images/2024/03/example.jpg")
     private String imageUrl;
+
+    private String imgNm;
+    private String imgPath;
 }

@@ -145,7 +145,7 @@ public class CommunityService {
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
 
-        return new PaginatedResponse<>(
+        return new PaginatedResponse<CommunityBoardResponseDto>(
                 boardDtos,
                 boardPage.getNumber(),
                 boardPage.getSize(),
@@ -161,7 +161,7 @@ public class CommunityService {
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
 
-        return new PaginatedResponse<>(
+        return new PaginatedResponse<CommunityBoardResponseDto>(
                 boardDtos,
                 boardPage.getNumber(),
                 boardPage.getSize(),

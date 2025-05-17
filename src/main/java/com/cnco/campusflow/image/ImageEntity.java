@@ -1,5 +1,6 @@
 package com.cnco.campusflow.image;
 
+import com.cnco.campusflow.cscenter.CsCenterBoardEntity;
 import com.cnco.campusflow.eventboard.EventBoardEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -44,5 +45,13 @@ public class ImageEntity extends com.cnco.campusflow.common.BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_board_id")
     private EventBoardEntity eventBoard;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cscenter_board_id")
+    private CsCenterBoardEntity board;
+
+    public void setBoard(CsCenterBoardEntity board) {
+        this.board = board;
+    }
 }
 
