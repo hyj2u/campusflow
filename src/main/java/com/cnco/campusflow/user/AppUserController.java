@@ -3,11 +3,9 @@ package com.cnco.campusflow.user;
 import com.cnco.campusflow.common.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,7 +34,7 @@ import java.util.Map;
         대부분의 API는 JWT 인증이 필요합니다.
         """
 )
-@SecurityRequirement(name = "bearerAuth")
+
 public class AppUserController {
     private final AppUserService appUserService;
 
@@ -185,7 +183,7 @@ public class AppUserController {
         summary = "전화번호 변경 요청",
         description = """
             새로운 전화번호로 변경하기 위한 인증 코드를 발송합니다.
-            
+            응답값에 인증코드 포함.
             * 인증 코드는 SMS로 발송됩니다.
             * 인증 코드는 3분간 유효합니다.
             """
