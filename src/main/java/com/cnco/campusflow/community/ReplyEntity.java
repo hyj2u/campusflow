@@ -64,4 +64,13 @@ public class ReplyEntity extends BaseEntity {
     @Column
     @Schema(description = "상위 댓글 ID (답글인 경우 사용)", example = "1")
     private Long upTreeId;
+    @Column
+    @Schema(description = "좋아요 수", example = "1")
+    private Integer likeCnt;
+    @Column
+    @Schema(description = "삭제 여부", example = "N")
+    private String deleteYn;
+    @Column
+    @Schema(description = "블라인드처리 여부", example = "N")
+    private String blindYn;
 }

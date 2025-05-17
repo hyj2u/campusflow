@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface CustomCommunityBoardRepository  {
     Page<CommunityBoardEntity> findFreeBoardWithSorting(String order, Pageable pageable);
     Page<CommunityBoardEntity> findQnABoardWithSorting(Integer collegeId, String order, Pageable pageable);
+
 }

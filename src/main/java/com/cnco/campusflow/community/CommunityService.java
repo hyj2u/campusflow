@@ -79,8 +79,15 @@ public class CommunityService {
         dto.setAppUserId(boardEntity.getAppUser().getAppUserId());
         return dto;
     }
+    public void likeBoard(Long boardId) {
+        CommunityBoardEntity boardEntity = communityBoardRepository.findById(boardId).get();
+        boardEntity.setLikeCnt(boardEntity.getLikeCnt() + 1);
+        communityBoardRepository.save(boardEntity);
+    }
 
     public void deleteBoard(Long boardId) {
+        replyRepository.deleteAllByBoardBoardId(boardId);
+        reportRepository.deleteAllByBoardBoardId(boardId);
         communityBoardRepository.deleteById(boardId);
     }
 
@@ -105,6 +112,9 @@ public class CommunityService {
             replyEntity = new ReplyEntity();
         }
         replyEntity.setContent(reply.getContent());
+        replyEntity.setLikeCnt(0);
+        replyEntity.setDeleteYn("N");
+        replyEntity.setBlindYn("N");
         replyEntity.setAppUser(appUser);
         replyEntity.setBoard(communityBoardRepository.findById(boardId).get());
         if (reply.getUpTreeId() == null) {
@@ -119,6 +129,7 @@ public class CommunityService {
         replyResponseDto.setContent(replyEntity.getContent());
         replyResponseDto.setUpTreeId(replyEntity.getUpTreeId());
         replyResponseDto.setLevel(replyEntity.getLevel());
+        replyResponseDto.setDeleteYn(replyEntity.getDeleteYn());
         replyResponseDto.setInsertTimestamp(replyEntity.getInsertTimestamp());
         replyResponseDto.setNickname(replyEntity.getAppUser().getNickname());
         replyResponseDto.setAppUserId(replyEntity.getAppUser().getAppUserId());
@@ -176,6 +187,8 @@ public class CommunityService {
                         reply.getAppUser().getNickname(), // 작성자 닉네임 반환
                         reply.getInsertTimestamp(),
                         reply.getReplyId(),
+                        reply.getDeleteYn(),
+                        reply.getBlindYn(),
                         reply.getAppUser().getCollege().getCollegeName(),
                         reply.getAppUser().getCollegeAdmissionYear()
                 ))
@@ -183,8 +196,17 @@ public class CommunityService {
     }
 
     public void deleteReply(Long replyId) {
-        replyRepository.deleteById(replyId);
+        ReplyEntity replyEntity = replyRepository.findById(replyId).get();
+        replyEntity.setDeleteYn("Y");
+        replyRepository.save(replyEntity);
     }
+    public void likeReply(Long replyId) {
+        ReplyEntity replyEntity = replyRepository.findById(replyId).get();
+        replyEntity.setLikeCnt(replyEntity.getLikeCnt() + 1);
+        replyRepository.save(replyEntity);
+    }
+
+
 
 
     private CommunityBoardResponseDto convertEntityToDto(CommunityBoardEntity boardEntity) {

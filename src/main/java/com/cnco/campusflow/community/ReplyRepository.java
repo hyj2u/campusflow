@@ -10,4 +10,5 @@ import java.util.List;
 public interface ReplyRepository extends JpaRepository<ReplyEntity, Long> {
     List<ReplyEntity> findAllByBoardBoardIdOrderByInsertTimestampAsc(Long boardId);
     List<ReplyEntity> findAllByBoardBoardIdOrderByInsertTimestampDesc(Long boardId);
+    void deleteAllByBoardBoardId(Long boardId);
 }
