@@ -1,5 +1,6 @@
 package com.cnco.campusflow.image;
 
+import com.cnco.campusflow.eventboard.EventBoardEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -39,5 +40,9 @@ public class ImageEntity extends com.cnco.campusflow.common.BaseEntity {
     @Column
     @Schema(description = "이미지 저장 경로", example = "/images/2024/03/example.jpg")
     private String imgPath;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_board_id")
+    private EventBoardEntity eventBoard;
 }
 
