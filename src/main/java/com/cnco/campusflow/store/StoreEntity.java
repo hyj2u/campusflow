@@ -206,5 +206,9 @@ public class StoreEntity extends BaseEntity {
     @Column
     @Schema(description = "경도", example = "126.9780")
     private Double longitude;
+
+    @Column
+    @Schema(description = "매장 상태", example = "O", allowableValues = {"O", "W", "C"})
+    private String storeStatus;
 }
 
