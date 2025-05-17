@@ -24,6 +24,7 @@ public class CsCenterBoardService {
     private final CsCenterBoardRepository csCenterBoardRepository;
     private final ImageRepository imageRepository;
     private final CodeRepository codeRepository;
+    private final CsCenterReplyService csCenterReplyService;
 
     @Transactional
     public CsCenterBoardResponseDto createBoard(CsCenterBoardRequestDto requestDto, AppUserEntity appUser, List<MultipartFile> images) {
@@ -137,6 +138,7 @@ public class CsCenterBoardService {
     }
 
     private CsCenterBoardResponseDto convertToResponseDto(CsCenterBoardEntity entity) {
+        List<CsCenterReplyResponseDto> replies = csCenterReplyService != null ? csCenterReplyService.getReplies(entity.getBoardId(), "DESC") : new ArrayList<>();
         return CsCenterBoardResponseDto.builder()
                 .boardId(entity.getBoardId())
                 .title(entity.getTitle())
@@ -155,6 +157,7 @@ public class CsCenterBoardService {
                                         .build())
                                 .toList()
                         : new ArrayList<>())
+                .replies(replies)
                 .build();
     }
 
