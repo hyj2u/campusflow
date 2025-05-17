@@ -137,7 +137,7 @@ public class TimeTableController {
     public ResponseEntity<CommonResponse<?>> getTimeTableDtl(
         @Parameter(
             description = "시간표 번호",
-            example = "1"
+            example = "2"
         ) 
         @PathVariable Long tmTableId,
         @Parameter(
@@ -150,7 +150,7 @@ public class TimeTableController {
                 * THU: 목요일
                 * FRI: 금요일
                 """,
-            example = "MON",
+            example = "WED",
             schema = @Schema(
                 allowableValues = {"MON", "TUE", "WED", "THU", "FRI"}
             )

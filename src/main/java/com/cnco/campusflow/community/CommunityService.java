@@ -78,6 +78,7 @@ public class CommunityService {
         CommunityBoardResponseDto dto = convertEntityToDto(boardEntity);
         dto.setNickname(boardEntity.getAppUser().getNickname());
         dto.setAppUserId(boardEntity.getAppUser().getAppUserId());
+        dto.setCollegeAdmissionYear(boardEntity.getAppUser().getCollegeAdmissionYear());
         return dto;
     }
     public void likeBoard(Long boardId) {

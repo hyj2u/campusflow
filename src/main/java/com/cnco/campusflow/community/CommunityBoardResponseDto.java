@@ -30,6 +30,7 @@ import java.util.List;
             "viewCnt": 10,
             "appUserId": 1,
             "nickname": "작성자",
+            "collegeAdmissionYear": "2024",
             "insertTimestamp": "2024-03-20T10:00:00",
             "images": [
                 {
@@ -77,10 +78,14 @@ public class CommunityBoardResponseDto {
 
     @Schema(description = "작성자 닉네임", example = "작성자")
     private String nickname;
+    @Schema(description = "대학 입학 년도 ",example = "2023")
+    private String collegeAdmissionYear;
 
     @Schema(description = "작성 시간", example = "2024-03-20T10:00:00")
     private LocalDateTime insertTimestamp;
 
     @Schema(description = "첨부된 이미지 목록")
     private List<ImageResponseDto> images;
+
+
 }

@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/comm/**").permitAll()
                         .requestMatchers("/user/signup", "/user/chk/**", "/user/login", "/user/refresh").permitAll() // 로그인 & 토큰 갱신은 인증 없이 허용
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll() // Swagger UI 관련 경로 허용
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
