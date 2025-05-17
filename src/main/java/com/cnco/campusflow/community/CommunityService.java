@@ -42,7 +42,7 @@ public class CommunityService {
             imageEntities = new ArrayList<>();
         } else {
             boardEntity = communityBoardRepository.findById(board.getBoardId()).orElseThrow(()
-                    -> new IllegalArgumentException("유효하지 않은 게시글 Id입니다."));
+                    -> new IllegalArgumentException("유효하지 않은 게시글 Id 입니다."));
             imageEntities = boardEntity.getImages();
             imageEntities.clear();
         }
