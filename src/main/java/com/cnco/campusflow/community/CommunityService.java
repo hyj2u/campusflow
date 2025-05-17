@@ -52,7 +52,8 @@ public class CommunityService {
         boardEntity.setSecretYn(board.getSecretYn());
         boardEntity.setViewCnt(0);
         boardEntity.setLikeCnt(0);
-        boardEntity.setBoardType(codeRepository.findByCodeCd(board.getType()));
+        boardEntity.setBoardType(codeRepository.findByCodeCd(board.getType())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 게시판 타입입니다.")));
 
         if (images != null) {
             for (MultipartFile image : images) {

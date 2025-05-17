@@ -61,8 +61,8 @@ public class TimeTableService {
         // 요일 세팅
         List<CodeEntity> days = courseDto.getDays().stream()
                 .map(codeCd -> {
-                    CodeEntity code = codeRepository.findByCodeCd(codeCd);
-                    if (code == null) throw new IllegalArgumentException("잘못된 요일 코드: " + codeCd);
+                    CodeEntity code = codeRepository.findByCodeCd(codeCd)
+                            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 코드입니다: " + codeCd));
                     return code;
                 })
                 .collect(Collectors.toList());
