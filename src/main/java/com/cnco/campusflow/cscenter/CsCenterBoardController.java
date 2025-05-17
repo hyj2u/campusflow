@@ -28,10 +28,12 @@ public class CsCenterBoardController {
         return ResponseEntity.ok(csCenterBoardService.createBoard(requestDto, appUser, images));
     }
 
-    @PutMapping
+    @PutMapping("/{boardId}")
     public ResponseEntity<CsCenterBoardResponseDto> updateBoard(
+            @PathVariable Long boardId,
             @RequestPart("board") CsCenterBoardRequestDto requestDto,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+        requestDto.setBoardId(boardId);
         return ResponseEntity.ok(csCenterBoardService.updateBoard(requestDto, images));
     }
 
