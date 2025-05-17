@@ -82,5 +82,10 @@ public class MenuEntity extends BaseEntity {
         ]
         """)
     private List<MenuOptionEntity> options;
+    @Column
+    @Schema(description = "주문 수량", example = "1")
+    private Integer orderCnt;
+
+
 }
 

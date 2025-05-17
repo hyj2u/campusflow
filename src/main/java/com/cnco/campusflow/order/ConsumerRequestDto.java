@@ -17,7 +17,7 @@ import lombok.Data;
     example = """
         {
             "consumerId": 1,
-            "orderAddrId": 1,
+            "orderAddrId": 4,
             "storeDemand": "포크 2개 주세요",
             "deliveryDemand": "문 앞에 놓아주세요"
         }

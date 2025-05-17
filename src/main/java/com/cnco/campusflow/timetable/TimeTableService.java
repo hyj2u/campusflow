@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,9 +36,10 @@ public class TimeTableService {
         // 사용자에 새 시간표 추가
         appUser.getTimetables().add(timetable);
         // Cascade 옵션으로 인해, 사용자 저장 시 시간표도 저장됨
+        TimetableEntity timetableEntity =timeTableRepository.save(timetable);
         appUserRepository.save(appUser);
 
-        return timetable;
+        return timetableEntity;
     }
 
     public CourseEntity registerCourse(CourseDto courseDto) {
@@ -58,20 +58,20 @@ public class TimeTableService {
         lecture.setEndTime(courseDto.getEndTime());
         lecture.setLocation(courseDto.getLocation());
         lecture.setProfessor(courseDto.getProfessor());
-        List<CodeEntity> days = new ArrayList<>();
-        for (String codeCd : courseDto.getDays()) {
-            days.add(codeRepository.findByCodeCd(codeCd));
-        }
-        lecture.setDays(days);
-        if (timetable.getCourses() == null) {
-            List<CourseEntity> lectures = new ArrayList<>();
-            lectures.add(lecture);
-            timetable.setCourses(lectures);
-        } else {
-            timetable.getCourses().add(lecture);
-        }
+        // 요일 세팅
+        List<CodeEntity> days = courseDto.getDays().stream()
+                .map(codeCd -> {
+                    CodeEntity code = codeRepository.findByCodeCd(codeCd);
+                    if (code == null) throw new IllegalArgumentException("잘못된 요일 코드: " + codeCd);
+                    return code;
+                })
+                .collect(Collectors.toList());
+
+        lecture.setDays(days); // 이 시점에서 연결 완료
+        CourseEntity savedLecture = courseRepository.save(lecture); //  save 이후 조인 테이블 insert 발생
+        timetable.getCourses().add(savedLecture);
         timeTableRepository.save(timetable);
-        return lecture;
+        return savedLecture;
 
     }
 

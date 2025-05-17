@@ -16,6 +16,7 @@ import com.cnco.campusflow.product.ProductRepository;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +46,7 @@ public class MenuService {
     private final FavoriteMenuRepository favoriteMenuRepository;
     private final ObjectMapper objectMapper;
     private final MenuRepository menuRepository;
+    private final CartRepository cartRepository;
 
     public List<CategoryResponseDto> getCategoriesByStore(Long storeId) {
         return categoryRepository.findAllByStoreStoreId(storeId)
@@ -103,7 +105,8 @@ public class MenuService {
 
         return toFavoriteMenuDto(favoriteMenu);
     }
-    public MenuEntity addCartMenu(MenuRequestDto menuRequestDto) throws JsonProcessingException {
+
+    public MenuEntity addCartMenu(MenuRequestDto menuRequestDto, AppUserEntity appUser) throws JsonProcessingException {
         log.info(objectMapper.writeValueAsString(menuRequestDto));
 
         List<MenuOptionEntity> options = buildMenuOptions(menuRequestDto);
@@ -114,8 +117,31 @@ public class MenuService {
         menu.setProduct(product);
         menu.setStore(product.getStore());
         menu.setOptions(options);
-        return  menuRepository.save(menu);
+        menu.setOrderCnt(menuRequestDto.getOrderCnt());
+        MenuEntity menuEntity = menuRepository.save(menu);
+        CartEntity cart;
+        if (cartRepository.findByAppUser(appUser) != null) {
+            cart = cartRepository.findByAppUser(appUser);
+            cart.getMenus().add(menuEntity);
+        } else {
+            cart = new CartEntity();
+            List<MenuEntity> menuEntities = new ArrayList<>();
+            menuEntities.add(menuEntity);
+            cart.setMenus(menuEntities);
+        }
+        cart.setAppUser(appUser);
+        cartRepository.save(cart);
+        return menuEntity;
+
     }
+    public CartResponseDto getCartList( AppUserEntity appUser)  {
+        CartEntity cart = cartRepository.findByAppUser(appUser);
+        if (cart == null) {
+            throw new EntityNotFoundException("장바구니가 존재하지 않습니다.");
+        };
+        return toCartResponseDto(cart);
+    }
+
     public void changeCartMenu(Long menuId, MenuRequestDto menuRequestDto) throws JsonProcessingException {
         log.info(objectMapper.writeValueAsString(menuRequestDto));
         MenuEntity menu = menuRepository.findById(menuId).get();
@@ -124,10 +150,15 @@ public class MenuService {
         // 기존 컬렉션 비우고, 새 옵션 추가
         menu.getOptions().clear();
         menu.getOptions().addAll(options);
+        menu.setOrderCnt(menuRequestDto.getOrderCnt());
         menuRepository.save(menu);
     }
+
     public void deleteCartMenu(Long menuId) throws JsonProcessingException {
         menuRepository.deleteById(menuId);
+    }
+    public void deleteCart(Long cartId) {
+        cartRepository.deleteById(cartId);
     }
 
 
@@ -137,9 +168,11 @@ public class MenuService {
                 favoriteMenuRepository.findAllByUserAppUserIdAndMenuStoreStoreId(appUser.getAppUserId(), storeId);
         return toFavoriteMenuDtoList(favoriteMenuEntities);
     }
+
     public void deleteFavoriteMenu(Long FavoriteMenuId) {
         favoriteMenuRepository.deleteById(FavoriteMenuId);
     }
+
     private List<FavoriteMenuResponseDto> toFavoriteMenuDtoList(List<FavoriteMenuEntity> entities) {
         List<FavoriteMenuResponseDto> responseList = new ArrayList<>();
         for (FavoriteMenuEntity favorite : entities) {
@@ -179,7 +212,6 @@ public class MenuService {
         }
         return responseList;
     }
-
 
 
     private List<MenuOptionEntity> buildMenuOptions(MenuRequestDto dto) {
@@ -267,7 +299,7 @@ public class MenuService {
         dto.setOptionId(option.getOptionId());
         dto.setOptionNm(option.getOptionNm());
         dto.setCodeNm(option.getCode().getCodeNm());
-
+        dto.setRequireYn(option.getRequireYn());
         List<OptDtlResponseDto> details = option.getOptions().stream()
                 .map(dtl -> {
                     OptDtlResponseDto d = new OptDtlResponseDto();
@@ -278,11 +310,38 @@ public class MenuService {
                     d.setMin(dtl.getMin());
                     d.setMax(dtl.getMax());
                     d.setUnitPrice(dtl.getUnitPrice());
+                    d.setDtlUseYn(dtl.getDtlUseYn());
                     return d;
                 })
                 .collect(Collectors.toList());
 
         dto.setDetails(details);
+        return dto;
+    }
+
+    private CartResponseDto toCartResponseDto(CartEntity cart) {
+        CartResponseDto dto = new CartResponseDto();
+        dto.setCartId(cart.getCartId());
+
+        List<MenuResponseDto> menus = cart.getMenus().stream()
+                .map(menu -> {
+                    MenuResponseDto menuDto = new MenuResponseDto();
+                    menuDto.setMenuId(menu.getMenuId());
+                    menuDto.setStoreId(menu.getStore().getStoreId());
+                    menuDto.setStoreName(menu.getStore().getStoreNm());
+                    menuDto.setProductId(menu.getProduct().getProductId());
+                    menuDto.setProductName(menu.getProduct().getProductNm());
+                    menuDto.setOrderCnt(menu.getOrderCnt());
+                    List<MenuOptionDto> optionDtos = menu.getOptions().stream()
+                            .map(this::toMenuOptionDto)
+                            .collect(Collectors.toList());
+
+                    menuDto.setOptions(optionDtos);
+                    return menuDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setMenus(menus);
         return dto;
     }
 }

@@ -35,10 +35,10 @@ public class OrderController {
     private final OrderService orderService;
 
     @Operation(
-        summary = "주문자 정보 추가",
+        summary = "주문자 정보 추가/수정",
         description = """
-            인증된 사용자의 주문자 정보를 추가합니다.
-            
+            인증된 사용자의 주문자 정보를 추가 및 수정 합니다.
+            consumerId가 있는 경우는 수정, 없는 경우 추가입니다. 
             * 주문자 ID, 배달 주소 ID, 요청사항을 포함합니다.
             * JWT 인증이 필요합니다.
             """
@@ -79,10 +79,10 @@ public class OrderController {
     }
 
     @Operation(
-        summary = "배달 주소 추가",
+        summary = "배달 주소 추가/수정",
         description = """
-            인증된 사용자의 배달 주소를 추가합니다.
-            
+            인증된 사용자의 배달 주소를 추가 및 수정합니다.
+            orderAddrId가 있는 경우 수정, 없는 경우 추가
             * 기본 주소, 상세 주소, 기본 배달지 여부를 포함합니다.
             * JWT 인증이 필요합니다.
             """
@@ -146,7 +146,7 @@ public class OrderController {
     }
 
     @Operation(
-        summary = "주문 생성",
+        summary = "주문하기",
         description = """
             새로운 주문을 생성합니다.
             

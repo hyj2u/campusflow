@@ -6,6 +6,7 @@ import com.cnco.campusflow.menu.MenuRepository;
 import com.cnco.campusflow.menu.MenuResponseDto;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.user.AppUserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +27,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     public ConsumerResponseDto addConsumerInfo(AppUserEntity appUser, ConsumerRequestDto consumerRequestDto) {
-        ConsumerEntity consumerEntity = consumerRequestDto.getConsumerId() != null
-                ? consumerRepository.findById(consumerRequestDto.getConsumerId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 consumerId: " + consumerRequestDto.getConsumerId()))
-                : new ConsumerEntity();
-
-        consumerEntity.setAppUser(appUser);
+        ConsumerEntity consumerEntity;
+        if(consumerRepository.findById(consumerRequestDto.getConsumerId()).isPresent()) {
+                consumerEntity = consumerRepository.findById(consumerRequestDto.getConsumerId()).get();
+        }else{
+            consumerEntity = new ConsumerEntity();
+            consumerEntity.setAppUser(appUser);
+        }
         consumerEntity.setDeliveryDemand(consumerRequestDto.getDeliveryDemand());
         consumerEntity.setStoreDemand(consumerRequestDto.getStoreDemand());
         consumerEntity.setOrderAddress(orderAddressRepository.findById(consumerRequestDto.getOrderAddrId())
@@ -97,6 +99,11 @@ public class OrderService {
             consumerEntity.setOrderAddress(null);
             consumerRepository.save(consumerEntity);
         }
+        if (orderAddressRepository.existsById(orderAddressId)) {
+            orderAddressRepository.deleteById(orderAddressId);
+        } else {
+            throw new EntityNotFoundException("OrderAddress not found with id: " + orderAddressId);
+        }
         orderAddressRepository.deleteById(orderAddressId);
     }
 
@@ -136,6 +143,8 @@ public class OrderService {
         dto.setAddressMain(consumer.getOrderAddress().getAddressMain());
         dto.setAddressDtl(consumer.getOrderAddress().getAddressDtl());
         dto.setPhone(user.getPhone());
+        dto.setDefaultYn(consumer.getOrderAddress().getDefaultYn());
+        dto.setOrderAddrId(consumer.getOrderAddress().getOrderAddrId());
         return dto;
     }
 
@@ -154,6 +163,7 @@ public class OrderService {
         dto.setTotalPrice(order.getTotalPrice());
         dto.setOrderStatus(order.getOrderStatus());
 
+
         ConsumerResponseDto consumerDto = new ConsumerResponseDto();
         consumerDto.setConsumerId(order.getConsumer().getConsumerId());
         consumerDto.setPhone(order.getConsumer().getAppUser().getPhone());
@@ -171,7 +181,7 @@ public class OrderService {
             menuDto.setProductName(menu.getProduct().getProductNm());
             menuDto.setStoreId(menu.getStore().getStoreId());
             menuDto.setStoreName(menu.getStore().getStoreNm());
-
+            menuDto.setOrderCnt(menu.getOrderCnt());
             List<MenuOptionDto> optionDtos = menu.getOptions().stream().map(option -> {
                 MenuOptionDto optDto = new MenuOptionDto();
                 optDto.setOptionId(option.getOptionEntity().getOptionId());

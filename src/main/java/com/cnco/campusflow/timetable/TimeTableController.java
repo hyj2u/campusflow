@@ -195,7 +195,7 @@ public class TimeTableController {
     })
     @GetMapping("/course/{courseId}")
     public ResponseEntity<CommonResponse<?>> getCourse(
-        @Parameter(description = "강의 번호") @PathVariable Long courseId
+        @Parameter(description = "강의 번호", example = "19") @PathVariable Long courseId
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(timeTableService.getCourse(courseId)));

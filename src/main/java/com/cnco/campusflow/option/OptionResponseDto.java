@@ -15,6 +15,7 @@ public class OptionResponseDto {
     private Long optionId;
     private String optionNm;
     private String codeNm; // 코드 이름
+    private String requireYn;
     private List<OptDtlResponseDto> details;
 
 }
