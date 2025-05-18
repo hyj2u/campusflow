@@ -53,7 +53,7 @@ public class AppUserPushEntity extends BaseEntity {
     private LocalDateTime sendDttm;
     @Column
     private String sendStatus;
-    @Column
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "code_id")
     private CodeEntity sendType;
