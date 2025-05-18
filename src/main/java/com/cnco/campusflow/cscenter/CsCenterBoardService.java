@@ -5,6 +5,8 @@ import com.cnco.campusflow.image.ImageEntity;
 import com.cnco.campusflow.image.ImageRepository;
 import com.cnco.campusflow.image.ImageResponseDto;
 import com.cnco.campusflow.user.AppUserEntity;
+import com.cnco.campusflow.code.CodeEntity;
+import com.cnco.campusflow.code.CodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,14 +23,21 @@ import java.util.List;
 public class CsCenterBoardService {
     private final CsCenterBoardRepository csCenterBoardRepository;
     private final ImageRepository imageRepository;
+    private final CodeRepository codeRepository;
+    private final CsCenterReplyService csCenterReplyService;
 
     @Transactional
     public CsCenterBoardResponseDto createBoard(CsCenterBoardRequestDto requestDto, AppUserEntity appUser, List<MultipartFile> images) {
+        // code_id 설정
+        CodeEntity codeEntity = codeRepository.findByCodeCd(requestDto.getType())
+                .orElseThrow(() -> new RuntimeException("Code not found for type: " + requestDto.getType()));
+
         // 게시판 엔티티 생성
         CsCenterBoardEntity board = CsCenterBoardEntity.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .appUser(appUser)
+                .boardType(codeEntity)
                 .viewCnt(0)
                 .build();
 
@@ -55,9 +64,14 @@ public class CsCenterBoardService {
     public CsCenterBoardResponseDto updateBoard(CsCenterBoardRequestDto requestDto, List<MultipartFile> images) {
         CsCenterBoardEntity board = findById(requestDto.getBoardId());
         
+        // code_id 설정
+        CodeEntity codeEntity = codeRepository.findByCodeCd(requestDto.getType())
+                .orElseThrow(() -> new RuntimeException("Code not found for type: " + requestDto.getType()));
+        
         // 게시판 정보 업데이트
         board.setTitle(requestDto.getTitle());
         board.setContent(requestDto.getContent());
+        board.setBoardType(codeEntity);
 
         // 이미지 처리
         List<ImageEntity> imageEntities = new ArrayList<>();
@@ -88,6 +102,7 @@ public class CsCenterBoardService {
         csCenterBoardRepository.delete(board);
     }
 
+    @Transactional
     public CsCenterBoardResponseDto getBoard(Long boardId) {
         CsCenterBoardEntity board = findById(boardId);
         board.incrementViewCount(); // 조회수 증가
@@ -123,6 +138,7 @@ public class CsCenterBoardService {
     }
 
     private CsCenterBoardResponseDto convertToResponseDto(CsCenterBoardEntity entity) {
+        List<CsCenterReplyResponseDto> replies = csCenterReplyService != null ? csCenterReplyService.getReplies(entity.getBoardId(), "DESC") : new ArrayList<>();
         return CsCenterBoardResponseDto.builder()
                 .boardId(entity.getBoardId())
                 .title(entity.getTitle())
@@ -141,6 +157,7 @@ public class CsCenterBoardService {
                                         .build())
                                 .toList()
                         : new ArrayList<>())
+                .replies(replies)
                 .build();
     }
 

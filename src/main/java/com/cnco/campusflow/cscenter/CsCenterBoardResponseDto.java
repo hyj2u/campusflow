@@ -24,4 +24,5 @@ public class CsCenterBoardResponseDto {
     private List<ImageResponseDto> images;
     private String profileImgUrl;
     private LocalDateTime insertTimestamp;
+    private List<CsCenterReplyResponseDto> replies;
 } 

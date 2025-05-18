@@ -19,7 +19,8 @@ import lombok.Data;
         {
             "replyId": 1,
             "content": "댓글 내용",
-            "upTreeId": 1
+            "upTreeId": 1.
+            "secretYn": "Y"
         }
         """
 )
@@ -33,4 +34,7 @@ public class ReplyRequestDto {
 
     @Schema(description = "상위 댓글 ID (답글인 경우 사용)", example = "1")
     private Long upTreeId;
+
+    @Schema(description = "비밀글 여부", example = "N")
+    private String secretYn;
 }

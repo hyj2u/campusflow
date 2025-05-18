@@ -30,6 +30,8 @@ import java.time.LocalDateTime;
             "nickname": "작성자",
             "deleteYn" : "N",
             "blindYn" : "N",
+            "secretYn": "N",
+            "likeCnt": 1,
             "insertTimestamp": "2024-03-20T10:00:00",
             "collegeName": "공과대학",
             "collegeAdmissionYear": "2024"
@@ -61,6 +63,10 @@ public class ReplyResponseDto {
     private String deleteYn;
     @Schema(description = "블라인드처리 여부", example = "N")
     private String blindYn;
+    @Schema(description = "비밀글 여부", example = "N")
+    private String secretYn;
+    @Schema(description = "좋아요 수", example = "1")
+    private Integer likeCnt;
 
     @Schema(description = "단과대학 이름", example = "공과대학")
     private String collegeName;
