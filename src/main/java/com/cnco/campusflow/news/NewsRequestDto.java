@@ -12,6 +12,7 @@ import lombok.Data;
         
         * 뉴스 등록 시 필요한 정보를 담습니다.
         * URL은 필수 입력 항목입니다.
+        * 활성화 여부는 선택사항이며 기본값은 Y입니다.
         """,
     example = """
         {
@@ -25,6 +26,14 @@ public class NewsRequestDto {
     @Schema(description = "뉴스 URL", example = "https://example.com/news/1", required = true)
     private String url;
 
-    @Schema(description = "활성화 여부", example = "Y", allowableValues = {"Y", "N"})
+    @Schema(
+        description = """
+            활성화 여부
+            * Y: 활성화
+            * N: 비활성화
+            """,
+        example = "Y",
+        allowableValues = {"Y", "N"}
+    )
     private String activeYn = "Y";  // 기본값 Y
 } 
