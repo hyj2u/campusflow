@@ -17,12 +17,15 @@ import lombok.Data;
         * 오늘의 뉴스 정보를 저장합니다.
         * 뉴스 URL과 활성화 여부를 관리합니다.
         * 생성/수정 시간이 자동으로 기록됩니다.
+        * 신고 기능을 지원합니다.
         """,
     example = """
         {
             "newsId": 1,
             "url": "https://example.com/news/1",
-            "activeYn": "Y"
+            "activeYn": "Y",
+            "reportYn": "N",
+            "reportReason": "부적절한 내용"
         }
         """
 )
@@ -40,5 +43,13 @@ public class NewsEntity extends BaseEntity {
     @Column
     @Schema(description = "활성화 여부", example = "Y", allowableValues = {"Y", "N"})
     private String activeYn;
+
+    @Column
+    @Schema(description = "신고 여부", example = "N", allowableValues = {"Y", "N"})
+    private String reportYn;
+
+    @Column
+    @Schema(description = "신고 사유", example = "부적절한 내용")
+    private String reportReason;
 }
 

@@ -28,4 +28,27 @@ public class NewsService {
         return newsRepository.findAllByActiveYn("Y");
     }
 
+    public NewsEntity addNews(NewsRequestDto requestDto) {
+        NewsEntity news = new NewsEntity();
+        news.setUrl(requestDto.getUrl());
+        news.setActiveYn(requestDto.getActiveYn());
+        news.setReportYn("N");  // 기본값 N
+        news.setReportReason(null);  // 기본값 null
+
+        return newsRepository.save(news);
+    }
+
+    public NewsEntity updateReportInfo(Long newsId, NewsReportRequestDto dto) {
+        NewsEntity news = newsRepository.findById(newsId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 뉴스입니다."));
+        news.setReportReason(dto.getReportReason());
+        news.setReportYn(dto.getReportYn());
+        return newsRepository.save(news);
+    }
+
+    public void deleteNews(Long newsId) {
+        NewsEntity news = newsRepository.findById(newsId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 뉴스입니다."));
+        newsRepository.delete(news);
+    }
 }
