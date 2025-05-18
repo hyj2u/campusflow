@@ -38,7 +38,7 @@ public class AppUserGifticonEntity extends BaseEntity {
     @Column
     private Long appUserGifticonId; // 기프티콘 회원 ID (PK)
     
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String phone;         // 연락처
 
     @Column(nullable = false)

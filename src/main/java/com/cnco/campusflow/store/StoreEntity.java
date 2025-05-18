@@ -157,7 +157,7 @@ public class StoreEntity extends BaseEntity {
 
     @Column
     @Schema(description = "스탬프 개수", example = "10")
-    private int stampNum;
+    private Integer stampNum;
 
     @Column
     @Schema(description = "예약 주문 가능 여부", example = "Y", allowableValues = {"Y", "N"})
