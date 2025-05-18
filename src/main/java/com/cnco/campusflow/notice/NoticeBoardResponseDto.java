@@ -25,7 +25,7 @@ import java.util.List;
             "boardId": 1,
             "title": "서비스 점검 안내",
             "content": "2024년 3월 20일 02:00 ~ 04:00 동안 서비스 점검이 진행됩니다.",
-            "registerDate": "2024-03-19T10:00:00",
+            "insertTimestamp": "2024-03-19T10:00:00",
             "viewCnt": 150,
             "pushYn": "Y",
             "talkYn": "Y",
@@ -55,7 +55,7 @@ public class NoticeBoardResponseDto {
     private String content;
 
     @Schema(description = "등록일시", example = "2024-03-19T10:00:00")
-    private LocalDateTime registerDate;
+    private LocalDateTime insertTimestamp;
 
     @Schema(description = "조회수", example = "150")
     private Integer viewCnt;
