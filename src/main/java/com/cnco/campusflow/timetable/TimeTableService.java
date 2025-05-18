@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -91,6 +88,7 @@ public class TimeTableService {
             return Collections.emptyList();
         }
         return appUser.getTimetables().stream()
+                .sorted(Comparator.comparing(TimetableEntity::getInsertTimestamp).reversed())
                 .map(timetable -> {
                     TimeTableListDto dto = new TimeTableListDto();
                     dto.setTmTableId(timetable.getTmTableId());
