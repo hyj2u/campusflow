@@ -72,25 +72,6 @@ public class NewsController {
                 .body(CommonResponse.of(newsService.addNews(requestDto)));
     }
 
-    @PutMapping("/{newsId}")
-    @Operation(
-        summary = "뉴스 신고 정보(부분) 수정",
-        description = """
-            뉴스의 신고 관련 정보만 수정합니다.\n* reportReason, reportYn만 수정됩니다.
-            """
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "신고 정보 수정 성공"),
-        @ApiResponse(responseCode = "400", description = "잘못된 입력값"),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 뉴스")
-    })
-    public ResponseEntity<CommonResponse<?>> updateReportInfo(
-            @PathVariable Long newsId,
-            @RequestBody NewsReportRequestDto dto
-    ) {
-        return ResponseEntity.ok(CommonResponse.of(newsService.updateReportInfo(newsId, dto)));
-    }
-
     @DeleteMapping("/{newsId}")
     @Operation(
         summary = "뉴스 삭제",
@@ -103,5 +84,26 @@ public class NewsController {
     public ResponseEntity<Void> deleteNews(@PathVariable Long newsId) {
         newsService.deleteNews(newsId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/report/{newsId}")
+    @Operation(
+        summary = "뉴스 수정요청 신고",
+        description = "뉴스 수정 요청을 신고합니다. (newsId는 URL, 인증된 사용자에서 appUserId 추출, 나머지는 body로 입력)"
+    )
+    public ResponseEntity<CommonResponse<?>> updateReport(
+            @PathVariable Long newsId,
+            @AuthenticationPrincipal com.cnco.campusflow.user.AppUserEntity user,
+            @RequestBody NewsReportRequestDto requestDto) {
+        return ResponseEntity.ok(CommonResponse.of(newsService.reportNews(newsId, user.getAppUserId(), requestDto)));
+    }
+
+    @GetMapping("/{newsId}")
+    @Operation(
+        summary = "뉴스 단건 조회",
+        description = "특정 뉴스(newsId) 게시글을 조회합니다. (신고내역 개수 reportCnt도 함께 반환)"
+    )
+    public ResponseEntity<NewsDetailResponseDto> getNews(@PathVariable Long newsId) {
+        return ResponseEntity.ok(newsService.getNewsDetail(newsId));
     }
 }

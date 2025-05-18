@@ -45,11 +45,7 @@ public class NewsEntity extends BaseEntity {
     private String activeYn;
 
     @Column
-    @Schema(description = "신고 여부", example = "N", allowableValues = {"Y", "N"})
-    private String reportYn;
-
-    @Column
-    @Schema(description = "신고 사유", example = "부적절한 내용")
-    private String reportReason;
+    @Schema(description = "조회수", example = "0")
+    private Integer viewCnt;
 }
 
