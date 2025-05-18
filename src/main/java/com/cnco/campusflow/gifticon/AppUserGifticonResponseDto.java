@@ -23,4 +23,5 @@ public class AppUserGifticonResponseDto {
     private String storeStatus;     // 매장 상태
     private Long senderId;          // 선물한 사람 ID
     private String senderNickname;  // 선물한 사람 닉네임
+    private Long purchaseAmount;    // 구매금액
 }

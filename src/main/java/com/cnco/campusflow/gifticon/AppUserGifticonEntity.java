@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
  * - sender: 기프티콘을 보낸 사용자 (선물인 경우)
  * - gifticon: 기프티콘 정보
  * - sendInfo: 발송 정보
+ * - purchaseAmount: 구매금액
  */
 @Entity
 @Table(name = "app_user_gifticon", schema = "admin")
@@ -74,4 +75,7 @@ public class AppUserGifticonEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity product; // 상품 정보
+
+    @Column(nullable = true)
+    private Long purchaseAmount; // 구매금액
 } 

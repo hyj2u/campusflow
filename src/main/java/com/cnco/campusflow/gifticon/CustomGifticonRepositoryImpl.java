@@ -41,7 +41,8 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
                     storeEntity.storeNm,
                     storeEntity.storeStatus,
                     appUserEntity.appUserId,
-                    appUserEntity.nickname
+                    appUserEntity.nickname,
+                    appUserGifticonEntity.purchaseAmount
                 ))
                 .from(appUserGifticonEntity)
                 .leftJoin(appUserGifticonEntity.sender, appUserEntity)
@@ -70,7 +71,8 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
                     storeEntity.storeNm,
                     storeEntity.storeStatus,
                     appUserEntity.appUserId,
-                    appUserEntity.nickname
+                    appUserEntity.nickname,
+                    appUserGifticonEntity.purchaseAmount
                 ))
                 .from(appUserGifticonEntity)
                 .leftJoin(appUserGifticonEntity.sender, appUserEntity)
