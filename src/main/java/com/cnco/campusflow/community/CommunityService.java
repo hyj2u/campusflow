@@ -28,6 +28,7 @@ public class CommunityService {
     private final CodeRepository codeRepository;
     private final ReplyRepository replyRepository;
     private final ReportRepository reportRepository;
+    private final CommunityLikeRepository communityLikeRepository;
     private final FileUtil fileUtil;
     @Value("${image.base.path}")
     private String imageBasePath; // Properties에서 이미지 경로 주입
@@ -81,9 +82,15 @@ public class CommunityService {
         dto.setCollegeAdmissionYear(boardEntity.getAppUser().getCollegeAdmissionYear());
         return dto;
     }
-    public void likeBoard(Long boardId) {
+
+    public void likeBoard(Long boardId, AppUserEntity appUser) {
         CommunityBoardEntity boardEntity = communityBoardRepository.findById(boardId).get();
         boardEntity.setLikeCnt(boardEntity.getLikeCnt() + 1);
+        CommunityLikeEntity likeEntity = new CommunityLikeEntity();
+        likeEntity.setBoard(boardEntity);
+        likeEntity.setAppUser(appUser);
+        communityLikeRepository.save(likeEntity);
+
         communityBoardRepository.save(boardEntity);
     }
 
@@ -96,10 +103,10 @@ public class CommunityService {
     public Long reportBoard(ReportDto reportDto, AppUserEntity appUser) {
         ReportEntity reportEntity = new ReportEntity();
         reportEntity.setReason(reportDto.getReason());
-        if(reportDto.getBoardId() != null) {
+        if (reportDto.getBoardId() != null) {
             reportEntity.setBoard(communityBoardRepository.findById(reportDto.getBoardId()).get());
         }
-        if(reportDto.getReplyId() != null) {
+        if (reportDto.getReplyId() != null) {
             reportEntity.setReply(replyRepository.findById(reportDto.getReplyId()).get());
         }
         reportEntity.setAppUser(appUser);
@@ -142,8 +149,8 @@ public class CommunityService {
         return replyResponseDto;
     }
 
-    public PaginatedResponse<CommunityBoardResponseDto> getFreeBoards(Integer collegeId, String order, String search,Pageable pageable) {
-        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findFreeBoardWithSortingAndSearch(collegeId, order,search, pageable);
+    public PaginatedResponse<CommunityBoardResponseDto> getFreeBoards(Integer collegeId, String order, String search, Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findFreeBoardWithSortingAndSearch(collegeId, order, search, pageable);
 
         List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
                 .map(this::convertEntityToDto)
@@ -158,8 +165,8 @@ public class CommunityService {
         );
     }
 
-    public PaginatedResponse<CommunityBoardResponseDto> getQnABoards(Integer collegeId, String order,String search,  Pageable pageable) {
-        Page<CommunityBoardEntity> boardPage = communityBoardRepository.getQnaBoardWithSortingAndSearch(collegeId, order,search, pageable);
+    public PaginatedResponse<CommunityBoardResponseDto> getQnABoards(Integer collegeId, String order, String search, Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.getQnaBoardWithSortingAndSearch(collegeId, order, search, pageable);
 
         List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
                 .map(this::convertEntityToDto)
@@ -173,6 +180,70 @@ public class CommunityService {
                 boardPage.getTotalPages()
         );
     }
+
+    public PaginatedResponse<CommunityBoardResponseDto> getMyBoard(AppUserEntity appUser, Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findAllByAppUserOrderByInsertTimestampDesc(appUser, pageable);
+
+        List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+
+        return new PaginatedResponse<CommunityBoardResponseDto>(
+                boardDtos,
+                boardPage.getNumber(),
+                boardPage.getSize(),
+                boardPage.getTotalElements(),
+                boardPage.getTotalPages()
+        );
+    }
+
+    public PaginatedResponse<CommunityBoardResponseDto> getBoardWithMyReplies(AppUserEntity appUser, String codeCd, Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findBoardsByMyReplies(appUser, codeCd, pageable);
+
+        List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+
+        return new PaginatedResponse<CommunityBoardResponseDto>(
+                boardDtos,
+                boardPage.getNumber(),
+                boardPage.getSize(),
+                boardPage.getTotalElements(),
+                boardPage.getTotalPages()
+        );
+    }
+
+    public PaginatedResponse<CommunityBoardResponseDto> getBoardWithMyLikes(AppUserEntity appUser, Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findBoardsByMyLikes(appUser, pageable);
+
+        List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+
+        return new PaginatedResponse<>(
+                boardDtos,
+                boardPage.getNumber(),
+                boardPage.getSize(),
+                boardPage.getTotalElements(),
+                boardPage.getTotalPages()
+        );
+    }
+    public PaginatedResponse<ReplyResponseDto> getRepliesWithMyLikes(AppUserEntity appUser, Pageable pageable) {
+        Page<ReplyEntity> replyPage = replyRepository.getRepliesWithMyLikes(appUser, pageable);
+
+        List<ReplyResponseDto> replyDtos = replyPage.getContent().stream()
+                .map(this::convertReplyToDto)
+                .collect(Collectors.toList());
+
+        return new PaginatedResponse<>(
+                replyDtos,
+                replyPage.getNumber(),
+                replyPage.getSize(),
+                replyPage.getTotalElements(),
+                replyPage.getTotalPages()
+        );
+    }
+
     public List<ReplyResponseDto> getReplies(Long boardId, String order) {
         List<ReplyEntity> replies;
 
@@ -203,18 +274,22 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
+
     public void deleteReply(Long replyId) {
         ReplyEntity replyEntity = replyRepository.findById(replyId).get();
         replyEntity.setDeleteYn("Y");
         replyRepository.save(replyEntity);
     }
-    public void likeReply(Long replyId) {
+
+    public void likeReply(Long replyId, AppUserEntity appUser) {
         ReplyEntity replyEntity = replyRepository.findById(replyId).get();
         replyEntity.setLikeCnt(replyEntity.getLikeCnt() + 1);
+        CommunityLikeEntity likeEntity = new CommunityLikeEntity();
+        likeEntity.setAppUser(replyEntity.getAppUser());
+        likeEntity.setReply(replyEntity);
+        communityLikeRepository.save(likeEntity);
         replyRepository.save(replyEntity);
     }
-
-
 
 
     private CommunityBoardResponseDto convertEntityToDto(CommunityBoardEntity boardEntity) {
@@ -240,10 +315,30 @@ public class CommunityService {
         }
         dto.setLikeCnt(boardEntity.getLikeCnt());
         dto.setReplyCnt(replyRepository.findAllByBoardBoardIdOrderByInsertTimestampAsc(boardEntity.getBoardId()).size());
-        if(boardEntity.getAppUser().getProfileImg() != null) {
-            dto.setProfileImgUrl(imageBaseUrl+"/"+boardEntity.getAppUser().getProfileImg().getImageId());
+        if (boardEntity.getAppUser().getProfileImg() != null) {
+            dto.setProfileImgUrl(imageBaseUrl + "/" + boardEntity.getAppUser().getProfileImg().getImageId());
         }
 
         return dto;
     }
+    private ReplyResponseDto convertReplyToDto(ReplyEntity reply) {
+        return new ReplyResponseDto(
+                reply.getContent(),
+                reply.getUpTreeId(),
+                reply.getAppUser().getAppUserId(),
+                reply.getLevel(),
+                reply.getAppUser().getNickname(),
+                reply.getInsertTimestamp(),
+                reply.getReplyId(),
+                reply.getDeleteYn(),
+                reply.getBlindYn(),
+                reply.getSecretYn(),
+                reply.getLikeCnt(),
+                reply.getAppUser().getCollege().getCollegeName(),
+                reply.getAppUser().getCollegeAdmissionYear()
+        );
+    }
+
+
 }
+

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ReplyRepository extends JpaRepository<ReplyEntity, Long> {
+public interface ReplyRepository extends JpaRepository<ReplyEntity, Long>, CustomReplyRepository {
     List<ReplyEntity> findAllByBoardBoardIdOrderByInsertTimestampAsc(Long boardId);
     List<ReplyEntity> findAllByBoardBoardIdOrderByInsertTimestampDesc(Long boardId);
     void deleteAllByBoardBoardId(Long boardId);

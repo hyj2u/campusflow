@@ -100,9 +100,9 @@ public class CommunityController {
     })
     @PutMapping("/{boardId}/like")
     public ResponseEntity<?> likeBoard(
-            @Parameter(description = "게시글 번호", example = "2") @PathVariable Long boardId
+            @Parameter(description = "게시글 번호", example = "2") @PathVariable Long boardId, @AuthenticationPrincipal AppUserEntity appUser
     ) {
-        communityService.likeBoard(boardId);
+        communityService.likeBoard(boardId, appUser);
         return ResponseEntity.noContent().build();
     }
 
@@ -193,11 +193,13 @@ public class CommunityController {
     })
     @PutMapping("/reply/{replyId}/like")
     public ResponseEntity<?> likeReply(
-            @Parameter(description = "댓글 번호", example = "1") @PathVariable Long replyId
+            @Parameter(description = "댓글 번호", example = "1") @PathVariable Long replyId,
+            @AuthenticationPrincipal AppUserEntity appuser
     ) {
-        communityService.likeReply(replyId);
+        communityService.likeReply(replyId, appuser);
         return ResponseEntity.noContent().build();
     }
+
     @Operation(
             summary = "댓글 삭제",
             description = """
@@ -268,7 +270,7 @@ public class CommunityController {
             @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CommonResponse.of(communityService.getFreeBoards(collegeId,order,search, pageable)));
+                .body(CommonResponse.of(communityService.getFreeBoards(collegeId, order, search, pageable)));
     }
 
     @Operation(
@@ -294,5 +296,100 @@ public class CommunityController {
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(communityService.getQnABoards(collegeId, order, search, pageable)));
+    }
+
+    @Operation(
+            summary = "내가 쓴글 목록 조회",
+            description = """
+                    내가쓴 게시판의 게시글 목록을 조회합니다.
+                    
+                    * 내가 쓴 게시판 글 목록 조회
+                    * 정렬 순서는 최신순
+                    * 페이지네이션을 지원합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 목록이 성공적으로 조회되었습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력값입니다")
+    })
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyBoards(
+            @AuthenticationPrincipal AppUserEntity user,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(communityService.getMyBoard(user, pageable)));
+    }
+
+    @Operation(
+            summary = "내가 댓글단 게시글 목록 조회",
+            description = """
+                    내가 댓글 단 게시판의 게시글 목록을 조회합니다.
+                    
+                    * codeCd의 따라 적용 free/qna
+                    * free 인경우 내가 댓글 단 게시글
+                    * qna 인 경우 내가 답변한 게시글
+                    * 정렬 순서는 최신순
+                    * 페이지네이션을 지원합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 목록이 성공적으로 조회되었습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력값입니다")
+    })
+    @GetMapping("/my/reply")
+    public ResponseEntity<?> getBoardsWithMyReply(
+            @AuthenticationPrincipal AppUserEntity user,
+            @Parameter(description = "게시판 유형", example = "free") @RequestParam String codeCd,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(communityService.getBoardWithMyReplies(user, codeCd, pageable)));
+    }
+
+    @Operation(
+            summary = "내가 좋아요한 게시글 목록 조회",
+            description = """
+                    내가 좋아요한 게시판의 게시글 목록을 조회합니다.
+                    
+                    
+                    * 정렬 순서는 최신순
+                    * 페이지네이션을 지원합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 목록이 성공적으로 조회되었습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력값입니다")
+    })
+    @GetMapping("/my/like")
+    public ResponseEntity<?> getBoardsWithMyLike(
+            @AuthenticationPrincipal AppUserEntity user,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(communityService.getBoardWithMyLikes(user, pageable)));
+    }
+
+    @Operation(
+            summary = "내가 좋아요한 댓글 목록 조회",
+            description = """
+                    내가 좋아요한 댓글 목록을 조회합니다.
+                    
+                    
+                    * 정렬 순서는 최신순
+                    * 페이지네이션을 지원합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 목록이 성공적으로 조회되었습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력값입니다")
+    })
+    @GetMapping("/reply/my/like")
+    public ResponseEntity<?> getRepliesWithMyLike(
+            @AuthenticationPrincipal AppUserEntity user,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(communityService.getBoardWithMyLikes(user, pageable)));
     }
 }
