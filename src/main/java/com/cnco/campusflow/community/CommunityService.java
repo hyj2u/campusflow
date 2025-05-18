@@ -117,6 +117,7 @@ public class CommunityService {
         replyEntity.setLikeCnt(0);
         replyEntity.setDeleteYn("N");
         replyEntity.setBlindYn("N");
+        replyEntity.setSecretYn(reply.getSecretYn());
         replyEntity.setAppUser(appUser);
         replyEntity.setBoard(communityBoardRepository.findById(boardId).get());
         if (reply.getUpTreeId() == null) {
@@ -132,14 +133,17 @@ public class CommunityService {
         replyResponseDto.setUpTreeId(replyEntity.getUpTreeId());
         replyResponseDto.setLevel(replyEntity.getLevel());
         replyResponseDto.setDeleteYn(replyEntity.getDeleteYn());
+        replyResponseDto.setSecretYn(replyEntity.getSecretYn());
+        replyResponseDto.setBlindYn(replyEntity.getBlindYn());
+        replyResponseDto.setLikeCnt(replyEntity.getLikeCnt());
         replyResponseDto.setInsertTimestamp(replyEntity.getInsertTimestamp());
         replyResponseDto.setNickname(replyEntity.getAppUser().getNickname());
         replyResponseDto.setAppUserId(replyEntity.getAppUser().getAppUserId());
         return replyResponseDto;
     }
 
-    public PaginatedResponse<CommunityBoardResponseDto> getFreeBoards(String order, Pageable pageable) {
-        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findFreeBoardWithSorting(order, pageable);
+    public PaginatedResponse<CommunityBoardResponseDto> getFreeBoards(Integer collegeId, String order, String search,Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findFreeBoardWithSortingAndSearch(collegeId, order,search, pageable);
 
         List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
                 .map(this::convertEntityToDto)
@@ -154,8 +158,8 @@ public class CommunityService {
         );
     }
 
-    public PaginatedResponse<CommunityBoardResponseDto> getQnABoards(Integer collegeId, String order, Pageable pageable) {
-        Page<CommunityBoardEntity> boardPage = communityBoardRepository.findQnABoardWithSorting(collegeId, order, pageable);
+    public PaginatedResponse<CommunityBoardResponseDto> getQnABoards(Integer collegeId, String order,String search,  Pageable pageable) {
+        Page<CommunityBoardEntity> boardPage = communityBoardRepository.getQnaBoardWithSortingAndSearch(collegeId, order,search, pageable);
 
         List<CommunityBoardResponseDto> boardDtos = boardPage.getContent().stream()
                 .map(this::convertEntityToDto)
@@ -191,6 +195,8 @@ public class CommunityService {
                         reply.getReplyId(),
                         reply.getDeleteYn(),
                         reply.getBlindYn(),
+                        reply.getSecretYn(),
+                        reply.getLikeCnt(),
                         reply.getAppUser().getCollege().getCollegeName(),
                         reply.getAppUser().getCollegeAdmissionYear()
                 ))

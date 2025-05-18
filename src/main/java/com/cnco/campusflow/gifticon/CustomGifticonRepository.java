@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CustomGifticonRepository {
-    Page<GifticonEntity> findGifticonList(AppUserEntity appUser, String type, String activeYn, Pageable pageable);
+    Page<AppUserGifticonResponseDto> findAppUserGifticonList(AppUserEntity appUser, String activeYn, String type, Pageable pageable);
 } 

@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
  * - sender: 기프티콘을 보낸 사용자 (선물인 경우)
  * - gifticon: 기프티콘 정보
  * - sendInfo: 발송 정보
+ * - purchaseAmount: 구매금액
  */
 @Entity
 @Table(name = "app_user_gifticon", schema = "admin")
@@ -37,7 +38,7 @@ public class AppUserGifticonEntity extends BaseEntity {
     @Column
     private Long appUserGifticonId; // 기프티콘 회원 ID (PK)
     
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String phone;         // 연락처
 
     @Column(nullable = false)
@@ -49,6 +50,9 @@ public class AppUserGifticonEntity extends BaseEntity {
     @Column(nullable = true, length = 10)
     private String type = "GIFT"; // 구분 (GIFT: 선물, PURCHASE: 구매)
 
+    @Column(nullable = true)
+    private LocalDateTime endDate; // 만료일
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id")
     private AppUserEntity receiver; // 기프티콘을 받은 사용자
@@ -59,7 +63,7 @@ public class AppUserGifticonEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gifticon_id")
-    private GifticonEntity gifticon; // 기프티콘 정보
+    private GifticonEntity gifticon; // 기프티콘 정보 (관리자페이지에서 기프티콘을 생성한 경우)
 
     @Column(nullable = false, length = 1)
     private String activeYn = "Y";  // 활성화 여부 (Y: 활성화, N: 비활성화), 기본값 Y
@@ -67,4 +71,11 @@ public class AppUserGifticonEntity extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "send_info_id")
     private SendInfoEntity sendInfo; // 발송 정보
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private ProductEntity product; // 상품 정보
+
+    @Column(nullable = true)
+    private Long purchaseAmount; // 구매금액
 } 
