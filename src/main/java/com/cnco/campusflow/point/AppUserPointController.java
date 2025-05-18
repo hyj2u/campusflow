@@ -21,10 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(
     name = "Point",
     description = "포인트 관련 API",
-    externalDocs = @io.swagger.v3.oas.annotations.ExternalDocumentation(
-        description = "포인트 정책 문서",
-        url = "https://docs.example.com/point-policy"
-    )
 )
 @SecurityRequirement(name = "bearerAuth")
 public class AppUserPointController {
@@ -39,7 +35,6 @@ public class AppUserPointController {
             
             - 현재 보유 포인트 수
             - 누적 포인트 수
-            - 포인트 만료 일시
             - 포인트 관련 메모
             
             포인트 정보가 없는 경우 기본값(0)으로 초기화된 정보를 반환합니다.
