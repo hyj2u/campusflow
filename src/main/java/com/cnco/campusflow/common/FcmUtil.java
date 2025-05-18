@@ -1,11 +1,8 @@
 package com.cnco.campusflow.common;
 
-import com.cnco.campusflow.sendinfo.SendInfoEntity;
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.bridge.Message;
-import org.springframework.stereotype.Component;
 import com.google.firebase.messaging.*;
-import java.util.Random;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
