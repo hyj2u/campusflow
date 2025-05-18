@@ -404,8 +404,7 @@ public class CsCenterBoardController {
                     * ASC: 오름차순
                     * DESC: 내림차순
                     """,
-                example = "DESC",
-                allowableValues = {"ASC", "DESC"}
+                example = "DESC"
             )
             @RequestParam(defaultValue = "DESC") String order) {
         return ResponseEntity.ok(csCenterReplyService.getReplies(boardId, order));
@@ -443,7 +442,7 @@ public class CsCenterBoardController {
     public ResponseEntity<CsCenterReplyResponseDto> setHelpfulYn(
             @Parameter(description = "댓글 ID", example = "1")
             @PathVariable Long replyId,
-            @Parameter(
+            @Schema(
                 description = """
                     도움이 되었나요 여부
                     * Y: 도움이 됨
