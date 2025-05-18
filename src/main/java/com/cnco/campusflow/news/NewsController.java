@@ -88,8 +88,8 @@ public class NewsController {
 
     @PutMapping("/report/{newsId}")
     @Operation(
-        summary = "뉴스 신고 수정",
-        description = "뉴스 신고 내역을 수정합니다. (newsId는 URL, 인증된 사용자에서 appUserId 추출, 나머지는 body로 입력)"
+        summary = "뉴스 수정요청 신고",
+        description = "뉴스 수정 요청을 신고합니다. (newsId는 URL, 인증된 사용자에서 appUserId 추출, 나머지는 body로 입력)"
     )
     public ResponseEntity<CommonResponse<?>> updateReport(
             @PathVariable Long newsId,
