@@ -95,11 +95,11 @@ public class OftenQnaController {
                     페이지 정보
                     * page: 페이지 번호 (0부터 시작)
                     * size: 페이지 크기
-                    * sort: 정렬 기준 (예: registerDate,desc)
+                    * sort: 정렬 기준 (예: insertTimestamp,desc)
                     """,
-                example = "page=0&size=10&sort=registerDate,desc"
+                example = "page=0&size=10&sort=insertTimestamp,desc"
             )
-            @PageableDefault(size = 10, sort = "registerDate", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
         if (category != null) {
             return ResponseEntity.ok(oftenQnaService.getQnasByCategory(category, pageable));
         }
