@@ -73,4 +73,7 @@ public class ReplyEntity extends BaseEntity {
     @Column
     @Schema(description = "블라인드처리 여부", example = "N")
     private String blindYn;
+    @Column
+    @Schema(description = "비밀글 여부", example = "N")
+    private String secretYn;
 }
