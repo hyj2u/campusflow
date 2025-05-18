@@ -57,15 +57,4 @@ public class GifticonEntity extends BaseEntity {
 
     @Column(nullable = false, length = 1)
     private String activeYn = "Y";  // 활성화 여부 (Y: 활성화, N: 비활성화), 기본값 Y
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private AppUserEntity appUser;  // 사용자 정보
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 } 

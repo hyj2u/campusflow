@@ -3,10 +3,12 @@ package com.cnco.campusflow.gifticon;
 import com.cnco.campusflow.common.PaginatedResponse;
 import com.cnco.campusflow.user.AppUserEntity;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,18 +23,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class GifticonController {
     private final GifticonService gifticonService;
 
-    @Operation(summary = "기프티콘 목록 조회", description = "로그인한 사용자의 기프티콘 목록을 조회합니다.")
+    @Operation(summary = "기프티콘 목록 조회", description = "로그인한 사용자의 기프티콘 목록을 조회합니다. 페이지 번호는 0부터 시작합니다.")
     @GetMapping
-    public PaginatedResponse<GifticonResponseDto> getGifticonList(
+    public PaginatedResponse<AppUserGifticonResponseDto> getGifticonList(
             @AuthenticationPrincipal AppUserEntity appUser,
-            @RequestParam(required = false, defaultValue = "Y") String activeYn,
+            @RequestParam(required = false) String activeYn,
             @RequestParam(required = false) String type,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @Parameter(description = "페이지 번호(0부터 시작), 크기, 정렬 기준(예: appUserGifticonId,desc)")
+            @PageableDefault(size = 10, sort = "appUserGifticonId", direction = Sort.Direction.DESC) Pageable pageable) {
 
         // 서비스 호출하여 데이터 조회
-        Page<GifticonResponseDto> gifticons = gifticonService.getGifticonList(appUser, type, activeYn, pageable);
+        Page<AppUserGifticonResponseDto> gifticons = gifticonService.getGifticonList(appUser, activeYn, type, pageable);
 
-        PaginatedResponse<GifticonResponseDto> response = new PaginatedResponse<>(
+        PaginatedResponse<AppUserGifticonResponseDto> response = new PaginatedResponse<>(
                 gifticons.getContent(),
                 gifticons.getNumber(),
                 gifticons.getSize(),

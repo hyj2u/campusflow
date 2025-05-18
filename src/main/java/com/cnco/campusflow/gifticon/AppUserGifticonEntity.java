@@ -49,6 +49,9 @@ public class AppUserGifticonEntity extends BaseEntity {
     @Column(nullable = true, length = 10)
     private String type = "GIFT"; // 구분 (GIFT: 선물, PURCHASE: 구매)
 
+    @Column(nullable = true)
+    private LocalDateTime endDate; // 만료일
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id")
     private AppUserEntity receiver; // 기프티콘을 받은 사용자
@@ -59,7 +62,7 @@ public class AppUserGifticonEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gifticon_id")
-    private GifticonEntity gifticon; // 기프티콘 정보
+    private GifticonEntity gifticon; // 기프티콘 정보 (관리자페이지에서 기프티콘을 생성한 경우)
 
     @Column(nullable = false, length = 1)
     private String activeYn = "Y";  // 활성화 여부 (Y: 활성화, N: 비활성화), 기본값 Y
@@ -67,4 +70,8 @@ public class AppUserGifticonEntity extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "send_info_id")
     private SendInfoEntity sendInfo; // 발송 정보
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private ProductEntity product; // 상품 정보
 } 
