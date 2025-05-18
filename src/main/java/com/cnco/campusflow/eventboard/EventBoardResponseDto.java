@@ -127,4 +127,7 @@ public class EventBoardResponseDto {
 
     @Schema(description = "관련 매장 ID 목록", example = "[1, 2, 3]")
     private List<Long> storeIds;
+
+    @Schema(description = "이벤트 종료일이 지났는지 여부 (Y: 종료, N: 진행중)", example = "N", allowableValues = {"Y", "N"})
+    private String endDateCheck;
 } 

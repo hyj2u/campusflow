@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,17 +26,32 @@ public class EventBoardService {
     private String imageBaseUrl;
 
     public EventBoardResponseDto getEvent(Long eventId) {
-        EventBoardEntity eventEntity = eventBoardRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 이벤트 ID 입니다."));
-        eventEntity.incrementViewCount();
-        return convertEntityToDto(eventEntity);
+        EventBoardEntity entity = eventBoardRepository.findById(eventId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이벤트입니다."));
+        EventBoardResponseDto dto = convertEntityToDto(entity);
+        LocalDate today = LocalDate.now();
+        if (entity.getEndDate() != null && entity.getEndDate().isBefore(today)) {
+            dto.setEndDateCheck("Y");
+        } else {
+            dto.setEndDateCheck("N");
+        }
+        return dto;
     }
 
     public PaginatedResponse<EventBoardResponseDto> getEvents(Pageable pageable) {
         Page<EventBoardEntity> eventPage = eventBoardRepository.findAllByOrderByInsertTimestampDesc(pageable);
 
         List<EventBoardResponseDto> eventDtos = eventPage.getContent().stream()
-                .map(this::convertEntityToDto)
+                .map(entity -> {
+                    EventBoardResponseDto dto = convertEntityToDto(entity);
+                    LocalDate today = LocalDate.now();
+                    if (entity.getEndDate() != null && entity.getEndDate().isBefore(today)) {
+                        dto.setEndDateCheck("Y");
+                    } else {
+                        dto.setEndDateCheck("N");
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
 
         return new PaginatedResponse<>(
