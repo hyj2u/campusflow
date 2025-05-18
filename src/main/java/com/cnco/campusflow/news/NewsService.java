@@ -23,32 +23,60 @@ import java.util.stream.Collectors;
 public class NewsService {
 
     private final NewsRepository newsRepository;
+    private final NewsReportRepository newsReportRepository;
 
-    public List<NewsEntity> getTodayNews() {
-        return newsRepository.findAllByActiveYn("Y");
+    public List<NewsDetailResponseDto> getTodayNews() {
+        List<NewsEntity> list = newsRepository.findAllByActiveYn("Y");
+        List<NewsDetailResponseDto> result = new ArrayList<>();
+        for (NewsEntity news : list) {
+            if (news.getViewCnt() == null) news.setViewCnt(0);
+            int reportCnt = newsReportRepository.findAllByNews(news).size();
+            result.add(new NewsDetailResponseDto(news, reportCnt));
+        }
+        return result;
     }
 
     public NewsEntity addNews(NewsRequestDto requestDto) {
         NewsEntity news = new NewsEntity();
         news.setUrl(requestDto.getUrl());
         news.setActiveYn(requestDto.getActiveYn());
-        news.setReportYn("N");  // 기본값 N
-        news.setReportReason(null);  // 기본값 null
-
+        news.setViewCnt(0);
         return newsRepository.save(news);
     }
 
-    public NewsEntity updateReportInfo(Long newsId, NewsReportRequestDto dto) {
+    public NewsReportEntity reportNews(Long newsId, Long appUserId, NewsReportRequestDto requestDto) {
         NewsEntity news = newsRepository.findById(newsId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 뉴스입니다."));
-        news.setReportReason(dto.getReportReason());
-        news.setReportYn(dto.getReportYn());
-        return newsRepository.save(news);
+        NewsReportEntity report = new NewsReportEntity();
+        report.setNews(news);
+        report.setReportReason(requestDto.getReportReason());
+        report.setComment(requestDto.getComment());
+        report.setAppUserId(appUserId);
+        report.setViewCnt(0);
+        return newsReportRepository.save(report);
     }
 
     public void deleteNews(Long newsId) {
         NewsEntity news = newsRepository.findById(newsId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 뉴스입니다."));
         newsRepository.delete(news);
+    }
+
+    public NewsEntity getNews(Long newsId) {
+        NewsEntity news = newsRepository.findById(newsId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 뉴스입니다."));
+        if (news.getViewCnt() == null) news.setViewCnt(0);
+        news.setViewCnt(news.getViewCnt() + 1);
+        newsRepository.save(news);
+        return news;
+    }
+
+    public NewsDetailResponseDto getNewsDetail(Long newsId) {
+        NewsEntity news = getNews(newsId);
+        int reportCnt = newsReportRepository.findAllByNews(news).size();
+        NewsDetailResponseDto dto = new NewsDetailResponseDto();
+        dto.setNews(news);
+        dto.setReportCnt(reportCnt);
+        return dto;
     }
 }
