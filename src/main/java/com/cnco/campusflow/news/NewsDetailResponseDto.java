@@ -1,0 +1,13 @@
+package com.cnco.campusflow.news;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class NewsDetailResponseDto {
+    private NewsEntity news;
+    private int reportCnt;
+} 
