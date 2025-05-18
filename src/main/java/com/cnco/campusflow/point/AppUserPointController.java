@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(
     name = "Point",
-    description = "포인트 관련 API",
+    description = "포인트 관련 API"
 )
 @SecurityRequirement(name = "bearerAuth")
 public class AppUserPointController {
