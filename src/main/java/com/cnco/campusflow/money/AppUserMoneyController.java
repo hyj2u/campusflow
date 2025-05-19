@@ -29,7 +29,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/money")
 @RequiredArgsConstructor
-@Tag(name = "Money Management", description = "사용자 머니 관리 API")
+@Tag(
+    name = "머니 관리",
+    description = """
+        사용자 머니 관리 API
+        
+        * 사용자의 머니 적립, 사용, 선물 기능을 제공합니다.
+        * 머니 사용 이력을 조회할 수 있습니다.
+        * 모든 API는 인증된 사용자만 접근 가능합니다.
+        * 머니는 1원 이상의 정수값만 사용 가능합니다.
+        * 머니 사용 시 잔액이 부족하면 400 에러가 발생합니다.
+        """
+)
 public class AppUserMoneyController {
 
     private final AppUserMoneyService appUserMoneyService;
@@ -42,8 +53,9 @@ public class AppUserMoneyController {
         description = """
             사용자의 현재 활성화된 머니 내역을 조회합니다.
             
-            - 현재 보유한 머니와 총 적립 머니를 반환합니다.
-            - 활성화된 머니 내역이 없는 경우 404 에러를 반환합니다.
+            * 현재 보유한 머니와 총 적립 머니를 반환합니다.
+            * 활성화된 머니 내역이 없는 경우 404 에러를 반환합니다.
+            * 인증되지 않은 사용자는 401 에러를 반환합니다.
             """
     )
     @ApiResponses(value = {
@@ -64,6 +76,7 @@ public class AppUserMoneyController {
         )
     })
     public ResponseEntity<AppUserMoneyEntity> getUserMoney(
+            @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser) {
         if (appUser == null) {
             return ResponseEntity.status(401).build();
@@ -81,33 +94,38 @@ public class AppUserMoneyController {
     }
 
     @PostMapping("/earn")
-    @Operation(summary = "머니 적립", description = """
+    @Operation(
+        summary = "머니 적립",
+        description = """
             사용자의 머니를 적립합니다.
             
-            - 적립할 머니는 1원 이상이어야 합니다.
-            - 머니 적립 시 메모를 남길 수 있습니다.
-            - 머니 적립 후 현재 보유 머니와 총 적립 머니가 자동으로 증가합니다.
-            """,
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "적립 성공",
-                content = @Content(schema = @Schema(implementation = AppUserMoneyEntity.class))
-            ),
-            @ApiResponse(
-                responseCode = "400",
-                description = "잘못된 요청",
-                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
-            ),
-            @ApiResponse(
-                responseCode = "401",
-                description = "인증되지 않은 사용자",
-                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
-            )
-        }
+            * 적립할 머니는 1원 이상이어야 합니다.
+            * 머니 적립 시 메모를 남길 수 있습니다.
+            * 머니 적립 후 현재 보유 머니와 총 적립 머니가 자동으로 증가합니다.
+            * 인증되지 않은 사용자는 401 에러를 반환합니다.
+            """
     )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "적립 성공",
+            content = @Content(schema = @Schema(implementation = AppUserMoneyEntity.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않은 사용자",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        )
+    })
     public ResponseEntity<AppUserMoneyEntity> earnMoney(
+            @Parameter(description = "머니 적립 요청")
             @Valid @RequestBody AppUserMoneyEarnRequestDto requestDto,
+            @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser) {
         if (appUser == null) {
             return ResponseEntity.status(401).build();
@@ -124,36 +142,40 @@ public class AppUserMoneyController {
         description = """
             사용자의 머니를 사용합니다.
             
-            - 사용할 머니는 1원 이상이어야 합니다.
-            - 현재 보유한 머니보다 많이 사용할 수 없습니다.
-            - 머니 사용 시 메모를 남길 수 있습니다.
-            - 머니 사용 후 현재 보유 머니가 감소합니다.
-            """,
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "사용 성공",
-                content = @Content(schema = @Schema(implementation = AppUserMoneyEntity.class))
-            ),
-            @ApiResponse(
-                responseCode = "400",
-                description = "잘못된 요청 또는 잔액 부족",
-                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
-            ),
-            @ApiResponse(
-                responseCode = "401",
-                description = "인증되지 않은 사용자",
-                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
-            ),
-            @ApiResponse(
-                responseCode = "404",
-                description = "매장을 찾을 수 없음",
-                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
-            )
-        }
+            * 사용할 머니는 1원 이상이어야 합니다.
+            * 현재 보유한 머니보다 많이 사용할 수 없습니다.
+            * 머니 사용 시 메모를 남길 수 있습니다.
+            * 머니 사용 후 현재 보유 머니가 감소합니다.
+            * 인증되지 않은 사용자는 401 에러를 반환합니다.
+            * 매장을 찾을 수 없는 경우 404 에러를 반환합니다.
+            """
     )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "사용 성공",
+            content = @Content(schema = @Schema(implementation = AppUserMoneyEntity.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 또는 잔액 부족",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않은 사용자",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "매장을 찾을 수 없음",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        )
+    })
     public ResponseEntity<AppUserMoneyEntity> useMoney(
+            @Parameter(description = "머니 사용 요청")
             @Valid @RequestBody AppUserMoneyUseRequestDto requestDto,
+            @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser) {
         if (appUser == null) {
             return ResponseEntity.status(401).build();
@@ -175,15 +197,46 @@ public class AppUserMoneyController {
     }
 
     @PostMapping("/gift")
-    @Operation(summary = "선물하기", description = "다른 사용자에게 머니를 선물합니다.")
+    @Operation(
+        summary = "머니 선물",
+        description = """
+            다른 사용자에게 머니를 선물합니다.
+            
+            * 선물할 머니는 1원 이상이어야 합니다.
+            * 현재 보유한 머니보다 많이 선물할 수 없습니다.
+            * 자기 자신에게는 선물할 수 없습니다.
+            * 선물 시 메모를 남길 수 있습니다.
+            * 선물 후 현재 보유 머니가 감소합니다.
+            * 인증되지 않은 사용자는 401 에러를 반환합니다.
+            * 받는 사람을 찾을 수 없는 경우 404 에러를 반환합니다.
+            """
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "선물 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-            @ApiResponse(responseCode = "404", description = "받는 사람을 찾을 수 없음")
+        @ApiResponse(
+            responseCode = "200",
+            description = "선물 성공",
+            content = @Content(schema = @Schema(implementation = AppUserMoneyEntity.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 또는 잔액 부족",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않은 사용자",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "받는 사람을 찾을 수 없음",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        )
     })
     public ResponseEntity<AppUserMoneyEntity> giftMoney(
+            @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser,
+            @Parameter(description = "머니 선물 요청")
             @RequestBody AppUserMoneyGiftRequestDto requestDto) {
         if (appUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -212,6 +265,7 @@ public class AppUserMoneyController {
             * ID 기준 내림차순으로 정렬됩니다.
             * type 파라미터로 특정 타입의 이력만 조회할 수 있습니다.
             * 정렬 기준을 지정할 수 있으며, 기본값은 appUserMoneyId 기준 내림차순입니다.
+            * 인증되지 않은 사용자는 401 에러를 반환합니다.
             """
     )
     @ApiResponses(value = {
@@ -227,8 +281,18 @@ public class AppUserMoneyController {
         )
     })
     public ResponseEntity<PaginatedResponse<AppUserMoneyEntity>> getUserMoneyHistory(
+            @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser,
-            @Parameter(description = "머니 타입 (EARN/USE/CHARGE/GIFT)", example = "EARN")
+            @Parameter(
+                description = """
+                    머니 타입
+                    * EARN: 적립
+                    * USE: 사용
+                    * CHARGE: 충전
+                    * GIFT: 선물
+                    """,
+                example = "EARN"
+            )
             @RequestParam(required = false) String type,
             @Parameter(
                 description = """
