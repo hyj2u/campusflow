@@ -4,7 +4,6 @@ import com.cnco.campusflow.product.ProductEntity;
 import com.cnco.campusflow.product.ProductRepository;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.user.AppUserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,7 +39,7 @@ public class GifticonService {
             return new PageImpl<>(gifticons.getContent(), pageable, gifticons.getTotalElements());
         } catch (Exception e) {
             log.error("기프티콘 목록 조회 중 오류 발생 - 원인: {}", e.getCause() != null ? e.getCause().getMessage() : e.getMessage(), e);
-            throw e;
+            throw new IllegalArgumentException("기프티콘 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
@@ -54,12 +53,12 @@ public class GifticonService {
 
             // 1. 상품 존재 여부 확인
             ProductEntity product = productRepository.findById(requestDto.getProductId())
-                    .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. (상품 ID: " + requestDto.getProductId() + ")"));
 
             // 2. 전화번호 리스트 검증
             List<String> phoneNumbers = requestDto.getPhoneNumbers();
             if (phoneNumbers != null && phoneNumbers.size() > requestDto.getQuantity()) {
-                throw new IllegalArgumentException("전화번호 개수는 구매 수량보다 클 수 없습니다.");
+                throw new IllegalArgumentException("전화번호 개수는 구매 수량보다 클 수 없습니다. (전화번호 개수: " + phoneNumbers.size() + ", 구매 수량: " + requestDto.getQuantity() + ")");
             }
 
             // 3. 개당 구매금액 계산 (원단위 절상)
@@ -102,9 +101,12 @@ public class GifticonService {
 
             log.info("기프티콘 생성 완료 - userId: {}, 생성된 기프티콘 수: {}, 개당 금액: {}", 
                     currentUser.getUserId(), gifticons.size(), amountPerGifticon);
+        } catch (IllegalArgumentException e) {
+            log.error("기프티콘 생성 중 유효성 검사 실패 - 원인: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("기프티콘 생성 중 오류 발생 - 원인: {}", e.getCause() != null ? e.getCause().getMessage() : e.getMessage(), e);
-            throw e;
+            throw new IllegalArgumentException("기프티콘 생성 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 } 

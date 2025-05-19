@@ -25,7 +25,7 @@ public class AppUserMoneyService {
     public AppUserMoneyEntity getUserMoney(AppUserEntity appUser) {
         List<AppUserMoneyEntity> currentMoneyList = appUserMoneyRepository.findByAppUserAndEndTimestampIsNull(appUser);
         if (currentMoneyList.isEmpty()) {
-            throw new RuntimeException("No active money record found");
+            throw new IllegalArgumentException("활성화된 머니 내역이 없습니다.");
         }
         return currentMoneyList.get(0);
     }
@@ -76,13 +76,13 @@ public class AppUserMoneyService {
         // 현재 활성화된 머니 내역 조회
         List<AppUserMoneyEntity> currentMoneyList = getUserMoneyList(appUser);
         if (currentMoneyList.isEmpty()) {
-            throw new RuntimeException("No active money record found");
+            throw new IllegalArgumentException("활성화된 머니 내역이 없습니다.");
         }
         AppUserMoneyEntity currentMoney = currentMoneyList.get(0);
 
         // 잔액 체크
         if (currentMoney.getCurrentMoney() < amount) {
-            throw new RuntimeException("Insufficient balance");
+            throw new IllegalArgumentException("잔액이 부족합니다. (현재 잔액: " + currentMoney.getCurrentMoney() + "원, 필요 금액: " + amount + "원)");
         }
 
         // 기존 머니 내역 종료 처리
@@ -106,18 +106,18 @@ public class AppUserMoneyService {
     public AppUserMoneyEntity giftMoney(AppUserEntity sender, AppUserEntity receiver, Long amount, String note) {
         // 자기 자신에게 선물하는 경우 체크
         if (sender.getAppUserId().equals(receiver.getAppUserId())) {
-            throw new RuntimeException("Cannot gift money to yourself");
+            throw new IllegalArgumentException("자기 자신에게는 머니를 선물할 수 없습니다.");
         }
 
         // Get sender's current money record
         List<AppUserMoneyEntity> senderMoneyList = getUserMoneyList(sender);
         if (senderMoneyList.isEmpty()) {
-            throw new RuntimeException("Sender has no money record");
+            throw new IllegalArgumentException("보내는 사람의 머니 내역이 없습니다.");
         }
         AppUserMoneyEntity senderMoney = senderMoneyList.get(0);
         
         if (senderMoney.getCurrentMoney() < amount.intValue()) {
-            throw new RuntimeException("Insufficient balance");
+            throw new IllegalArgumentException("잔액이 부족합니다. (현재 잔액: " + senderMoney.getCurrentMoney() + "원, 선물 금액: " + amount + "원)");
         }
 
         // End sender's current record

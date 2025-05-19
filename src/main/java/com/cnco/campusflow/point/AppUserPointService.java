@@ -18,7 +18,7 @@ public class AppUserPointService {
     @Transactional(readOnly = true)
     public AppUserPointEntity getUserPoint(AppUserEntity appUser, Long storeId) {
         StoreEntity store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new IllegalArgumentException("Store not found with id: " + storeId));
+            .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다. (매장 ID: " + storeId + ")"));
 
         return appUserPointRepository.findByAppUserAndStoreAndEndTimestampIsNull(appUser, store)
             .orElse(AppUserPointEntity.builder()
@@ -31,14 +31,18 @@ public class AppUserPointService {
 
     @Transactional
     public AppUserPointEntity usePoint(AppUserEntity appUser, Long storeId, Integer usePointCount, String note) {
+        if (usePointCount < 1) {
+            throw new IllegalArgumentException("사용할 포인트는 1 이상이어야 합니다.");
+        }
+
         StoreEntity store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new IllegalArgumentException("Store not found with id: " + storeId));
+            .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다. (매장 ID: " + storeId + ")"));
 
         AppUserPointEntity currentPoint = appUserPointRepository.findByAppUserAndStoreAndEndTimestampIsNull(appUser, store)
-            .orElseThrow(() -> new IllegalArgumentException("No active point found for this store"));
+            .orElseThrow(() -> new IllegalArgumentException("해당 매장의 활성화된 포인트 내역이 없습니다."));
 
         if (currentPoint.getCurrentPointCount() < usePointCount) {
-            throw new IllegalArgumentException("Not enough points. Current point count: " + currentPoint.getCurrentPointCount());
+            throw new IllegalArgumentException("포인트가 부족합니다. (현재 포인트: " + currentPoint.getCurrentPointCount() + ", 필요 포인트: " + usePointCount + ")");
         }
 
         // 기존 포인트 정보 종료 처리
@@ -59,8 +63,12 @@ public class AppUserPointService {
 
     @Transactional
     public AppUserPointEntity earnPoint(AppUserEntity appUser, Long storeId, Integer earnPointCount, String note) {
+        if (earnPointCount < 1) {
+            throw new IllegalArgumentException("적립할 포인트는 1 이상이어야 합니다.");
+        }
+
         StoreEntity store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new IllegalArgumentException("Store not found with id: " + storeId));
+            .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다. (매장 ID: " + storeId + ")"));
 
         AppUserPointEntity currentPoint = appUserPointRepository.findByAppUserAndStoreAndEndTimestampIsNull(appUser, store)
             .orElse(AppUserPointEntity.builder()
