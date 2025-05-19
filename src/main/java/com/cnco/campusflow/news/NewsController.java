@@ -4,6 +4,7 @@ import com.cnco.campusflow.timetable.CourseDto;
 import com.cnco.campusflow.timetable.TimeTableDto;
 import com.cnco.campusflow.timetable.TimeTableService;
 import com.cnco.campusflow.user.AppUserEntity;
+import com.cnco.campusflow.common.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/news")
@@ -45,9 +49,9 @@ public class NewsController {
         @ApiResponse(responseCode = "400", description = "잘못된 입력값")
     })
     @GetMapping
-    public ResponseEntity<?> getTodayNews() {
+    public ResponseEntity<CommonResponse<List<Map<String, Object>>>> getTodayNews() {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(newsService.getTodayNews());
+                .body(CommonResponse.of(newsService.getTodayNewsFlat()));
     }
 
     @Operation(
@@ -90,11 +94,11 @@ public class NewsController {
         summary = "뉴스 수정요청 신고",
         description = "뉴스 수정 요청을 신고합니다. (newsId는 URL, 인증된 사용자에서 appUserId 추출, 나머지는 body로 입력)"
     )
-    public ResponseEntity<?> updateReport(
+    public ResponseEntity<Map<String, Object>> updateReport(
             @PathVariable Long newsId,
             @AuthenticationPrincipal com.cnco.campusflow.user.AppUserEntity user,
             @RequestBody NewsReportRequestDto requestDto) {
-        return ResponseEntity.ok(newsService.reportNews(newsId, user.getAppUserId(), requestDto));
+        return ResponseEntity.ok(newsService.reportNewsAndReturnFlat(newsId, user.getAppUserId(), requestDto));
     }
 
     @GetMapping("/{newsId}")
@@ -102,7 +106,7 @@ public class NewsController {
         summary = "뉴스 단건 조회",
         description = "특정 뉴스(newsId) 게시글을 조회합니다. (신고내역 개수 reportCnt도 함께 반환)"
     )
-    public ResponseEntity<NewsDetailResponseDto> getNews(@PathVariable Long newsId) {
-        return ResponseEntity.ok(newsService.getNewsDetail(newsId));
+    public ResponseEntity<CommonResponse<Map<String, Object>>> getNews(@PathVariable Long newsId) {
+        return ResponseEntity.ok(CommonResponse.of(newsService.getNewsDetailFlat(newsId)));
     }
 }

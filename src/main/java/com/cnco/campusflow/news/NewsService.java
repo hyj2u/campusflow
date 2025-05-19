@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,25 @@ public class NewsService {
             if (news.getViewCnt() == null) news.setViewCnt(0);
             int reportCnt = newsReportRepository.findAllByNews(news).size();
             result.add(new NewsDetailResponseDto(news, reportCnt));
+        }
+        return result;
+    }
+
+    public List<Map<String, Object>> getTodayNewsFlat() {
+        List<NewsEntity> list = newsRepository.findAllByActiveYn("Y");
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (NewsEntity news : list) {
+            if (news.getViewCnt() == null) news.setViewCnt(0);
+            int reportCnt = newsReportRepository.findAllByNews(news).size();
+            Map<String, Object> map = new HashMap<>();
+            map.put("insertTimestamp", news.getInsertTimestamp());
+            map.put("updateTimestamp", news.getUpdateTimestamp());
+            map.put("newsId", news.getNewsId());
+            map.put("url", news.getUrl());
+            map.put("activeYn", news.getActiveYn());
+            map.put("viewCnt", news.getViewCnt());
+            map.put("reportCnt", reportCnt);
+            result.add(map);
         }
         return result;
     }
@@ -78,5 +99,24 @@ public class NewsService {
         dto.setNews(news);
         dto.setReportCnt(reportCnt);
         return dto;
+    }
+
+    public Map<String, Object> getNewsDetailFlat(Long newsId) {
+        NewsEntity news = getNews(newsId);
+        int reportCnt = newsReportRepository.findAllByNews(news).size();
+        Map<String, Object> map = new HashMap<>();
+        map.put("insertTimestamp", news.getInsertTimestamp());
+        map.put("updateTimestamp", news.getUpdateTimestamp());
+        map.put("newsId", news.getNewsId());
+        map.put("url", news.getUrl());
+        map.put("activeYn", news.getActiveYn());
+        map.put("viewCnt", news.getViewCnt());
+        map.put("reportCnt", reportCnt);
+        return map;
+    }
+
+    public Map<String, Object> reportNewsAndReturnFlat(Long newsId, Long appUserId, NewsReportRequestDto requestDto) {
+        reportNews(newsId, appUserId, requestDto);
+        return getNewsDetailFlat(newsId);
     }
 }

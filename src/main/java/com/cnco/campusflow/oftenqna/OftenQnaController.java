@@ -110,7 +110,7 @@ public class OftenQnaController {
         } else {
             response = oftenQnaService.getQnas(pageable);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.of(response.getContent()));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.of(response.getData()));
     }
 
     @GetMapping("/{qnaId}")
