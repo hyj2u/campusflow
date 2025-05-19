@@ -54,15 +54,31 @@ public class AppUserPointEntity extends BaseEntity {
     @Schema(description = "매장 정보")
     private StoreEntity store;
 
-    @Schema(description = "누적 포인트 수", example = "1000")
+    @Schema(
+        description = """
+            현재 포인트
+            * 현재 보유하고 있는 포인트
+            * 기본값 0
+            * 필수 입력 항목
+            """,
+        example = "500"
+    )
     @Column(nullable = false)
     @Builder.Default
-    private Integer totalPointCount = 0;
+    private Integer currentPoint = 0;
 
-    @Schema(description = "현재 보유 포인트 수", example = "500")
+    @Schema(
+        description = """
+            총 적립 포인트
+            * 지금까지 적립한 총 포인트
+            * 기본값 0
+            * 필수 입력 항목
+            """,
+        example = "1000"
+    )
     @Column(nullable = false)
     @Builder.Default
-    private Integer currentPointCount = 0;
+    private Integer totalPoint = 0;
 
     @Schema(description = "포인트 만료 일시", example = "2024-12-31T23:59:59")
     @Column
@@ -71,4 +87,30 @@ public class AppUserPointEntity extends BaseEntity {
     @Schema(description = "포인트 적립/사용 메모", example = "커피 구매로 포인트 적립")
     @Column(length = 500)
     private String note;
+
+    @Schema(
+        description = """
+            거래 금액
+            * 거래에 대한 금액
+            * 필수 입력 항목
+            * 양수: 적립
+            * 음수: 사용
+            """,
+        example = "100"
+    )
+    @Column(nullable = false)
+    private Integer amount;
+
+    @Column(nullable = false, length = 10)
+    @Schema(
+        description = """
+            거래 유형
+            * USE: 사용
+            * EARN: 적립
+            * 필수 입력 항목
+            """,
+        example = "EARN",
+        allowableValues = {"USE", "EARN"}
+    )
+    private String type;
 } 

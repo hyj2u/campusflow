@@ -1,7 +1,10 @@
 package com.cnco.campusflow.point;
 
+import com.cnco.campusflow.store.StoreEntity;
+import com.cnco.campusflow.store.StoreRepository;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.common.ErrorRespDto;
+import com.cnco.campusflow.common.PaginatedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/point")
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class AppUserPointController {
 
     private final AppUserPointService appUserPointService;
+    private final StoreRepository storeRepository;
 
     @GetMapping("/{storeId}")
     @Operation(
@@ -81,21 +87,26 @@ public class AppUserPointController {
     @Operation(
         summary = "포인트 사용",
         description = """
-            특정 매장에서 포인트를 사용합니다.
+            사용자의 포인트를 사용합니다.
             
-            - 사용할 포인트 수량은 현재 보유 포인트를 초과할 수 없습니다.
+            - 사용할 포인트는 1 이상이어야 합니다.
+            - 현재 보유 포인트보다 많은 포인트를 사용할 수 없습니다.
             - 포인트 사용 시 메모를 남길 수 있습니다.
-            - 포인트 사용 후 현재 보유 포인트가 자동으로 차감됩니다.
             """,
         responses = {
             @ApiResponse(
                 responseCode = "200",
-                description = "사용 성공",
+                description = "포인트 사용 성공",
                 content = @Content(schema = @Schema(implementation = AppUserPointEntity.class))
             ),
             @ApiResponse(
                 responseCode = "400",
-                description = "잘못된 요청 또는 포인트 부족",
+                description = """
+                    잘못된 요청
+                    - 포인트가 부족한 경우
+                    - 잘못된 매장 ID
+                    - 포인트 금액이 1 미만인 경우
+                    """,
                 content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
             ),
             @ApiResponse(
@@ -111,23 +122,20 @@ public class AppUserPointController {
         }
     )
     public ResponseEntity<AppUserPointEntity> usePoint(
-        @AuthenticationPrincipal AppUserEntity appUser,
-        @Parameter(
-            description = "매장 ID",
-            example = "1",
-            required = true,
-            schema = @Schema(type = "integer", format = "int64")
-        ) @PathVariable Long storeId,
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "포인트 사용 요청",
-            required = true,
-            content = @Content(schema = @Schema(implementation = AppUserPointUseRequestDto.class))
-        ) @RequestBody AppUserPointUseRequestDto requestDto
-    ) {
+            @AuthenticationPrincipal AppUserEntity appUser,
+            @Parameter(
+                description = "매장 ID",
+                example = "1",
+                required = true,
+                schema = @Schema(type = "integer", format = "int64")
+            ) @PathVariable Long storeId,
+            @RequestBody AppUserPointRequestDto requestDto) {
         if (appUser == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(appUserPointService.usePoint(appUser, storeId, requestDto.getUsePointCount(), requestDto.getNote()));
+        StoreEntity store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다. (매장 ID: " + storeId + ")"));
+        return ResponseEntity.ok(appUserPointService.usePoint(appUser, store, requestDto.getAmount(), requestDto.getNote()));
     }
 
     @PostMapping("/{storeId}/earn")
@@ -148,7 +156,11 @@ public class AppUserPointController {
             ),
             @ApiResponse(
                 responseCode = "400",
-                description = "잘못된 요청",
+                description = """
+                    잘못된 요청
+                    - 잘못된 매장 ID
+                    - 포인트 금액이 1 미만인 경우
+                    """,
                 content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
             ),
             @ApiResponse(
@@ -171,15 +183,87 @@ public class AppUserPointController {
             required = true,
             schema = @Schema(type = "integer", format = "int64")
         ) @PathVariable Long storeId,
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "포인트 적립 요청",
-            required = true,
-            content = @Content(schema = @Schema(implementation = AppUserPointEarnRequestDto.class))
-        ) @RequestBody AppUserPointEarnRequestDto requestDto
+        @RequestBody AppUserPointRequestDto requestDto
     ) {
         if (appUser == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(appUserPointService.earnPoint(appUser, storeId, requestDto.getEarnPointCount(), requestDto.getNote()));
+        StoreEntity store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다. (매장 ID: " + storeId + ")"));
+        return ResponseEntity.ok(appUserPointService.earnPoint(appUser, store, requestDto.getAmount(), requestDto.getNote()));
     }
-} 
+
+    @GetMapping("/{storeId}/history")
+    @Operation(
+        summary = "포인트 이력 조회",
+        description = """
+            특정 매장에서의 사용자 포인트 이력을 조회합니다.
+            
+            - 포인트 적립/사용 내역
+            - 포인트 금액
+            - 포인트 메모
+            - 포인트 처리 시간
+            
+            필터링:
+            - type: 포인트 유형 (EARN: 적립, USE: 사용)
+            - type이 없으면 전체 내역 조회
+            
+            페이징 처리:
+            - page: 페이지 번호 (0부터 시작)
+            - size: 페이지당 항목 수
+            """,
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "조회 성공",
+                content = @Content(schema = @Schema(implementation = PaginatedResponse.class))
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "잘못된 요청 (예: 존재하지 않는 매장 ID)",
+                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+            ),
+            @ApiResponse(
+                responseCode = "401",
+                description = "인증되지 않은 사용자",
+                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+            ),
+            @ApiResponse(
+                responseCode = "500",
+                description = "서버 오류",
+                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+            )
+        }
+    )
+    public ResponseEntity<PaginatedResponse<AppUserPointEntity>> getPointHistory(
+        @AuthenticationPrincipal AppUserEntity appUser,
+        @Parameter(
+            description = "매장 ID",
+            example = "1",
+            required = true,
+            schema = @Schema(type = "integer", format = "int64")
+        ) @PathVariable Long storeId,
+        @Parameter(
+            description = "포인트 유형 (EARN: 적립, USE: 사용)",
+            example = "EARN",
+            schema = @Schema(type = "string", allowableValues = {"EARN", "USE"})
+        ) @RequestParam(required = false) String type,
+        @Parameter(
+            description = "페이지 번호 (0부터 시작)",
+            example = "0",
+            schema = @Schema(type = "integer", defaultValue = "0")
+        ) @RequestParam(defaultValue = "0") int page,
+        @Parameter(
+            description = "페이지당 항목 수",
+            example = "10",
+            schema = @Schema(type = "integer", defaultValue = "10")
+        ) @RequestParam(defaultValue = "10") int size
+    ) {
+        if (appUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+        StoreEntity store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다. (매장 ID: " + storeId + ")"));
+        return ResponseEntity.ok(appUserPointService.getPointHistory(appUser, store, type, page, size));
+    }
+}
