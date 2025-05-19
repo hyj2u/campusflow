@@ -15,10 +15,10 @@ public class SendUtil {
     public SendInfoEntity generateKakaoSendInfo(String msg, String title, String phone) {
         SendInfoEntity sendInfo = new SendInfoEntity();
         sendInfo.setSendMsg(msg);
-        sendInfo.setSendStatus("PENDING");
         sendInfo.setSendTitle(title);
-        sendInfo.setSendType("KAKAO");
+        sendInfo.setSendType("A");
         sendInfo.setPhone(phone);
+        sendInfo.setSendStatus("READY");
         return sendInfo;
     }
 }

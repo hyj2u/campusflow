@@ -1,6 +1,5 @@
 package com.cnco.campusflow.push;
 
-import com.cnco.campusflow.stamp.AppUserStampEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,8 +35,8 @@ public class PushController {
                 description = "Push 발송 성공",
                 content = @Content(
                     schema = @Schema(
-                        implementation = AppUserStampEntity.class,
-                        description = "스탬프 사용 후 업데이트된 정보"
+                        implementation = PushResponseDto.class,
+                        description = "Push 발송 결과"
                     )
                 )
             ),
@@ -48,8 +47,7 @@ public class PushController {
     )
     @PostMapping("/send")
     public ResponseEntity<?> sendPush(@RequestBody PushRequestDto requestDto) {
-        pushService.sendPushToUser(requestDto);
-        return ResponseEntity.ok("푸시 전송 완료");
+        return ResponseEntity.ok( pushService.sendPushToUser(requestDto));
     }
 
 

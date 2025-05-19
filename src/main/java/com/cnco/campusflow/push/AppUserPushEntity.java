@@ -55,6 +55,8 @@ public class AppUserPushEntity extends BaseEntity {
     private String sendStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "code_id")
+    @JoinColumn(name = "send_type_id")
     private CodeEntity sendType;
+    @Column
+    private String sendSubType;
 } 

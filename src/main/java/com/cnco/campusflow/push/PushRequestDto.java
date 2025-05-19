@@ -10,7 +10,9 @@ import lombok.Data;
                 {
                   "recvUserId": 1,
                   "title": "알림 도착!",
-                  "body": "새로운 강의가 등록되었습니다."
+                  "body": "새로운 강의가 등록되었습니다.",
+                  "sendType": "COMM",
+                  "sendSubType": "댓글"
                 }
                 """
 )
@@ -31,4 +33,21 @@ public class PushRequestDto {
             example = "내용입니다."
     )
     private String body;
+    @Schema(
+            description = "알림 분류",
+            example = "COMM",
+            allowableValues = {"COMM", "ORDER", "NOTICE"}
+    )
+    private String type;
+    @Schema(
+            description = "알림 분류",
+            example = "COMM",
+            allowableValues = {"COMM", "ORDER", "NOTICE"}
+    )
+    private String sendType;
+    @Schema(
+            description = "알림 상세 분류",
+            example = "댓글"
+    )
+    private String sendSubType;
 } 
