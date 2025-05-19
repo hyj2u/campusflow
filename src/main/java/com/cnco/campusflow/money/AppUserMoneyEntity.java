@@ -97,6 +97,19 @@ public class AppUserMoneyEntity extends BaseEntity {
     @Builder.Default
     private Integer totalMoney = 0;
 
+    @Schema(
+        description = """
+            거래 금액
+            * 거래에 대한 금액
+            * 필수 입력 항목
+            * 양수: 적립/선물받음
+            * 음수: 사용/선물보냄
+            """,
+        example = "1000"
+    )
+    @Column(nullable = false)
+    private Integer amount;
+
     @Column(nullable = false, length = 10)
     @Schema(
         description = """

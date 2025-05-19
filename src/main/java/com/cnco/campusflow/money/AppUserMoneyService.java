@@ -15,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AppUserMoneyService {
 
     private final AppUserMoneyRepository appUserMoneyRepository;
@@ -59,6 +60,7 @@ public class AppUserMoneyService {
                 .store(store)
                 .currentMoney(currentMoney.getCurrentMoney() + amount)
                 .totalMoney(currentMoney.getTotalMoney() + amount)
+                .amount(amount)  // 양수로 설정
                 .type("EARN")
                 .note(note)
                 .build();
@@ -95,6 +97,7 @@ public class AppUserMoneyService {
                 .store(store)
                 .currentMoney(currentMoney.getCurrentMoney() - amount)
                 .totalMoney(currentMoney.getTotalMoney())  // totalMoney는 유지
+                .amount(-amount)  // 음수로 설정
                 .type("USE")
                 .note(note)
                 .build();
@@ -129,6 +132,7 @@ public class AppUserMoneyService {
                 .appUser(sender)
                 .currentMoney(senderMoney.getCurrentMoney() - amount.intValue())
                 .totalMoney(senderMoney.getTotalMoney())  // totalMoney 유지
+                .amount(-amount.intValue())  // 음수로 설정
                 .type("GIFT")
                 .note(note != null ? note + " (to: " + receiver.getNickname() + ")" : "머니 선물 보냄 (to: " + receiver.getNickname() + ")")
                 .build();
@@ -155,6 +159,7 @@ public class AppUserMoneyService {
                 .appUser(receiver)
                 .currentMoney(receiverMoney.getCurrentMoney() + amount.intValue())
                 .totalMoney(receiverMoney.getTotalMoney())  // totalMoney 유지
+                .amount(amount.intValue())  // 양수로 설정
                 .type("GIFT")
                 .note(note != null ? note + " (from: " + sender.getNickname() + ")" : "머니 선물 받음 (from: " + sender.getNickname() + ")")
                 .build();
