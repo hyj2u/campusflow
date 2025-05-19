@@ -1,5 +1,6 @@
 package com.cnco.campusflow.oftenqna;
 
+import com.cnco.campusflow.common.CommonResponse;
 import com.cnco.campusflow.common.PaginatedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,8 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/oftenqna")
@@ -61,7 +65,7 @@ public class OftenQnaController {
     public ResponseEntity<OftenQnaResponseDto> createQna(
             @Parameter(description = "자주 묻는 질문 생성 요청")
             @RequestBody OftenQnaRequestDto requestDto) {
-        return ResponseEntity.ok(oftenQnaService.createQna(requestDto));
+        return ResponseEntity.status(HttpStatus.OK).body(oftenQnaService.createQna(requestDto));
     }
 
     @GetMapping
@@ -87,7 +91,7 @@ public class OftenQnaController {
             description = "서버 내부 오류"
         )
     })
-    public ResponseEntity<PaginatedResponse<OftenQnaResponseDto>> getQnas(
+    public ResponseEntity<CommonResponse<List<OftenQnaResponseDto>>> getQnas(
             @Parameter(description = "카테고리 (선택사항)", example = "PAYMENT")
             @RequestParam(required = false) String category,
             @Parameter(
@@ -100,10 +104,13 @@ public class OftenQnaController {
                 example = "page=0&size=10&sort=insertTimestamp,desc"
             )
             @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
+        PaginatedResponse<OftenQnaResponseDto> response;
         if (category != null) {
-            return ResponseEntity.ok(oftenQnaService.getQnasByCategory(category, pageable));
+            response = oftenQnaService.getQnasByCategory(category, pageable);
+        } else {
+            response = oftenQnaService.getQnas(pageable);
         }
-        return ResponseEntity.ok(oftenQnaService.getQnas(pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.of(response.getContent()));
     }
 
     @GetMapping("/{qnaId}")
@@ -134,6 +141,6 @@ public class OftenQnaController {
     public ResponseEntity<OftenQnaResponseDto> getQna(
             @Parameter(description = "자주 묻는 질문 ID", example = "1")
             @PathVariable Long qnaId) {
-        return ResponseEntity.ok(oftenQnaService.getQna(qnaId));
+        return ResponseEntity.status(HttpStatus.OK).body(oftenQnaService.getQna(qnaId));
     }
 } 
