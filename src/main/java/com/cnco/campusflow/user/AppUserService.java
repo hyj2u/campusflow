@@ -160,10 +160,13 @@ public class AppUserService {
         String code = sendUtil.generateCode();
         String msg =  "인증번호: "+ code+"입니다.";
         SendInfoEntity sendInfoEntity = sendUtil.generateKakaoSendInfo(msg,"CampusFlow", user.getPhone() );
+        sendInfoEntity.setReceiver(appUserRepository.findByUserId(user.getUserId()).get());
         sendInfoEntity.setReqSendTm(LocalDateTime.now());
         sendInfoEntity =sendInfoRepository.save(sendInfoEntity);
         //알림톡 DB Insert 추가 예정
         sendInfoEntity.setSendStatus("SUCCESS");
+        sendInfoEntity.setSentTm(LocalDateTime.now());
+        sendInfoRepository.save(sendInfoEntity);
         return code;
     }
     public void verifyAndChangePhone(AppUserEntity user, PhoneVerifyDto phoneVerifyDto) {
