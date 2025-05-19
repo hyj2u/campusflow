@@ -71,15 +71,7 @@ public class GifticonController {
             @RequestParam(required = false) String activeYn,
             @Parameter(description = "기프티콘 타입 (PURCHASE/GIFT)", example = "PURCHASE")
             @RequestParam(required = false) String type,
-            @Parameter(
-                description = """
-                    페이지 정보
-                    * page: 페이지 번호 (0부터 시작)
-                    * size: 페이지 크기
-                    * sort: 정렬 기준 (예: appUserGifticonId,desc)
-                    """,
-                example = "page=0&size=10&sort=appUserGifticonId,desc"
-            )
+            @Parameter(hidden = true)
             @PageableDefault(size = 10, sort = "appUserGifticonId", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Page<AppUserGifticonResponseDto> gifticons = gifticonService.getGifticonList(appUser, activeYn, type, pageable);

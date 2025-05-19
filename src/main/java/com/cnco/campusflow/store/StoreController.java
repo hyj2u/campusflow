@@ -55,7 +55,7 @@ public class StoreController {
         @Parameter(description = "검색어") @RequestParam(required = false) String search,
         @Parameter(description = "위도", example = "37.5665") @RequestParam Double latitude,
         @Parameter(description = "경도", example = "126.9780") @RequestParam Double longitude,
-        @PageableDefault(size = 10) Pageable pageable
+        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     ) {
         Page<StoreListDto> page = storeService.findStores(search, latitude, longitude, pageable);
         return new PaginatedResponse<>(

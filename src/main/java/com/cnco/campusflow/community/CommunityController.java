@@ -267,7 +267,7 @@ public class CommunityController {
             @Parameter(description = "단과대학 ID", example = "1") @RequestParam(required = false) Integer collegeId,
             @Parameter(description = "정렬 순서 (latest, popular)", example = "latest") @RequestParam(required = false) String order,
             @Parameter(description = "검색어", example = "수강신청") @RequestParam(required = false) String search,
-            @PageableDefault(size = 10) Pageable pageable
+            @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(communityService.getFreeBoards(collegeId, order, search, pageable)));
@@ -292,7 +292,7 @@ public class CommunityController {
             @Parameter(description = "단과대학 ID", example = "1") @RequestParam(required = false) Integer collegeId,
             @Parameter(description = "정렬 순서 (latest, popular)", example = "latest") @RequestParam(required = false) String order,
             @Parameter(description = "검색어", example = "수강신청") @RequestParam(required = false) String search,
-            @PageableDefault(size = 10) Pageable pageable
+            @Parameter (hidden = true) @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(communityService.getQnABoards(collegeId, order, search, pageable)));
@@ -315,6 +315,7 @@ public class CommunityController {
     @GetMapping("/my")
     public ResponseEntity<?> getMyBoards(
             @AuthenticationPrincipal AppUserEntity user,
+            @Parameter(hidden = true)
             @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -341,7 +342,7 @@ public class CommunityController {
     public ResponseEntity<?> getBoardsWithMyReply(
             @AuthenticationPrincipal AppUserEntity user,
             @Parameter(description = "게시판 유형", example = "free") @RequestParam String codeCd,
-            @PageableDefault(size = 10) Pageable pageable
+            @Parameter(hidden = true)  @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(communityService.getBoardWithMyReplies(user, codeCd, pageable)));
@@ -364,7 +365,7 @@ public class CommunityController {
     @GetMapping("/my/like")
     public ResponseEntity<?> getBoardsWithMyLike(
             @AuthenticationPrincipal AppUserEntity user,
-            @PageableDefault(size = 10) Pageable pageable
+            @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(communityService.getBoardWithMyLikes(user, pageable)));
@@ -387,7 +388,7 @@ public class CommunityController {
     @GetMapping("/reply/my/like")
     public ResponseEntity<?> getRepliesWithMyLike(
             @AuthenticationPrincipal AppUserEntity user,
-            @PageableDefault(size = 10) Pageable pageable
+            @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(communityService.getBoardWithMyLikes(user, pageable)));

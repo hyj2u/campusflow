@@ -94,15 +94,7 @@ public class OftenQnaController {
     public ResponseEntity<CommonResponse<List<OftenQnaResponseDto>>> getQnas(
             @Parameter(description = "카테고리 (선택사항)", example = "PAYMENT")
             @RequestParam(required = false) String category,
-            @Parameter(
-                description = """
-                    페이지 정보
-                    * page: 페이지 번호 (0부터 시작)
-                    * size: 페이지 크기
-                    * sort: 정렬 기준 (예: insertTimestamp,desc)
-                    """,
-                example = "page=0&size=10&sort=insertTimestamp,desc"
-            )
+            @Parameter(hidden = true)
             @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
         PaginatedResponse<OftenQnaResponseDto> response;
         if (category != null) {
