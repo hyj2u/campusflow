@@ -1,6 +1,5 @@
 package com.cnco.campusflow.news;
 
-import com.cnco.campusflow.common.CommonResponse;
 import com.cnco.campusflow.timetable.CourseDto;
 import com.cnco.campusflow.timetable.TimeTableDto;
 import com.cnco.campusflow.timetable.TimeTableService;
@@ -46,9 +45,9 @@ public class NewsController {
         @ApiResponse(responseCode = "400", description = "잘못된 입력값")
     })
     @GetMapping
-    public ResponseEntity<CommonResponse<?>> getTodayNews() {
+    public ResponseEntity<?> getTodayNews() {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CommonResponse.of(newsService.getTodayNews()));
+                .body(newsService.getTodayNews());
     }
 
     @Operation(
@@ -65,11 +64,11 @@ public class NewsController {
         @ApiResponse(responseCode = "400", description = "잘못된 입력값")
     })
     @PostMapping
-    public ResponseEntity<CommonResponse<?>> addNews(
+    public ResponseEntity<?> addNews(
             @Parameter(description = "뉴스 등록 정보") @RequestBody NewsRequestDto requestDto
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CommonResponse.of(newsService.addNews(requestDto)));
+                .body(newsService.addNews(requestDto));
     }
 
     @DeleteMapping("/{newsId}")
@@ -91,11 +90,11 @@ public class NewsController {
         summary = "뉴스 수정요청 신고",
         description = "뉴스 수정 요청을 신고합니다. (newsId는 URL, 인증된 사용자에서 appUserId 추출, 나머지는 body로 입력)"
     )
-    public ResponseEntity<CommonResponse<?>> updateReport(
+    public ResponseEntity<?> updateReport(
             @PathVariable Long newsId,
             @AuthenticationPrincipal com.cnco.campusflow.user.AppUserEntity user,
             @RequestBody NewsReportRequestDto requestDto) {
-        return ResponseEntity.ok(CommonResponse.of(newsService.reportNews(newsId, user.getAppUserId(), requestDto)));
+        return ResponseEntity.ok(newsService.reportNews(newsId, user.getAppUserId(), requestDto));
     }
 
     @GetMapping("/{newsId}")
