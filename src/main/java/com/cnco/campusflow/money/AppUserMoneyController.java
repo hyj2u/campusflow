@@ -294,15 +294,7 @@ public class AppUserMoneyController {
                 example = "EARN"
             )
             @RequestParam(required = false) String type,
-            @Parameter(
-                description = """
-                    페이지 정보
-                    * page: 페이지 번호 (0부터 시작)
-                    * size: 페이지 크기
-                    * sort: 정렬 기준 (예: appUserMoneyId,desc)
-                    """,
-                example = "page=0&size=10&sort=appUserMoneyId,desc"
-            )
+            @Parameter(hidden = true)
             @PageableDefault(size = 10, sort = "appUserMoneyId", direction = Sort.Direction.DESC) Pageable pageable) {
         
         if (appUser == null) {

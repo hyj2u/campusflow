@@ -89,15 +89,7 @@ public class EventBoardController {
         )
     })
     public ResponseEntity<PaginatedResponse<EventBoardResponseDto>> getEvents(
-            @Parameter(
-                description = """
-                    페이지 정보
-                    * page: 페이지 번호 (0부터 시작)
-                    * size: 페이지 크기
-                    * sort: 정렬 기준 (예: insertTimestamp,desc)
-                    """,
-                example = "page=0&size=10&sort=insertTimestamp,desc"
-            )
+            @Parameter(hidden = true)
             @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(eventBoardService.getEvents(pageable));
     }
