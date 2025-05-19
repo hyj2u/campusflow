@@ -59,4 +59,6 @@ public class AppUserPushEntity extends BaseEntity {
     private CodeEntity sendType;
     @Column
     private String sendSubType;
+    @Column
+    private String showYn;
 } 

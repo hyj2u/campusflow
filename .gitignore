@@ -1,1 +1,4 @@
 /src/main/resources/firebase/**
+/.gradle/
+/build/
+/.idea/

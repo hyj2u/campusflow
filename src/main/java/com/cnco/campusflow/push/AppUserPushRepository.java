@@ -11,7 +11,7 @@ import java.util.List;
  * 앱 사용자 푸시 정보 관리를 위한 레포지토리 인터페이스
  */
 @Repository
-public interface AppUserPushRepository extends JpaRepository<AppUserPushEntity, Long> {
+public interface AppUserPushRepository extends JpaRepository<AppUserPushEntity, Long>, CustomAppUserPushRepository {
     
     /**
      * 푸시 ID와 활성화 여부로 앱 사용자 푸시 목록을 조회합니다.

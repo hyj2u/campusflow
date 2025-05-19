@@ -2,6 +2,7 @@ package com.cnco.campusflow.push;
 
 import com.cnco.campusflow.code.CodeRepository;
 import com.cnco.campusflow.common.FcmUtil;
+import com.cnco.campusflow.common.PaginatedResponse;
 import com.cnco.campusflow.jwt.RefreshTokenEntity;
 import com.cnco.campusflow.jwt.RefreshTokenRepository;
 import com.cnco.campusflow.sendinfo.SendInfoEntity;
@@ -9,11 +10,14 @@ import com.cnco.campusflow.sendinfo.SendInfoRepository;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.user.AppUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,16 +63,40 @@ public class PushService {
         pushEntity.setSendStatus("SUCCESS");
         pushEntity.setSendType(codeRepository.findByCodeCd(dto.getSendType()).get());
         pushEntity.setSendSubType(dto.getSendSubType());
-        appUserPushRepository.save(pushEntity);
-        PushResponseDto response = new PushResponseDto();
-        response.setRecvUserId(user.getAppUserId());
-        response.setTitle(dto.getTitle());
-        response.setBody(dto.getBody());
-        response.setSendStatus("SUCCESS");
-        response.setSendType(dto.getSendType());
-        response.setSendSubType(dto.getSendSubType());
-        response.setAppUserPushId(pushEntity.getAppUserPushId());
-        return response;
+        pushEntity.setShowYn("Y");
+        pushEntity=appUserPushRepository.save(pushEntity);
+        return convertPushToDto(pushEntity);
 
     }
+    public  PaginatedResponse<PushResponseDto>getPushList(AppUserEntity appUser, String sendType, Pageable pageable) {
+        Page<AppUserPushEntity> pushEntities = appUserPushRepository.getPushList(appUser, sendType, pageable);
+        List<PushResponseDto> dtoList = pushEntities.getContent().stream()
+                .map(this::convertPushToDto)
+                .collect(Collectors.toList());
+
+        return new PaginatedResponse<>(
+                dtoList,
+                pushEntities.getNumber(),
+                pushEntities.getSize(),
+                pushEntities.getTotalElements(),
+                pushEntities.getTotalPages()
+        );
+    }
+    public  void deletePush(Long appUserPushId) {
+      AppUserPushEntity appUserPushEntity= appUserPushRepository.findById(appUserPushId).get();
+      appUserPushEntity.setShowYn("N");
+      appUserPushRepository.save(appUserPushEntity);
+    }
+    private PushResponseDto convertPushToDto(AppUserPushEntity entity) {
+        PushResponseDto dto = new PushResponseDto();
+        dto.setRecvUserId(entity.getAppUser().getAppUserId());
+        dto.setTitle(entity.getSendInfo().getSendTitle());
+        dto.setBody(entity.getSendInfo().getSendMsg());
+        dto.setSendStatus(entity.getSendStatus());
+        dto.setSendType(entity.getSendType().getCodeCd());
+        dto.setSendSubType(entity.getSendSubType());
+        dto.setAppUserPushId(entity.getAppUserPushId());
+        return dto;
+    }
+
 }
