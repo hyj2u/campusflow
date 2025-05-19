@@ -4,9 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import com.cnco.campusflow.common.CommonResponse;
 
 @RestController
 @RequestMapping("/terms")
@@ -17,15 +20,15 @@ public class TermsController {
 
     @GetMapping
     @Operation(summary = "전체 약관 목록 조회", description = "terms 테이블의 전체 레코드 내용을 조회합니다.")
-    public List<TermsEntity> getAllTerms() {
-        return termsService.getAllTerms();
+    public ResponseEntity<CommonResponse<List<TermsEntity>>> getAllTerms() {
+        return ResponseEntity.ok(CommonResponse.of(termsService.getAllTerms()));
     }
 
     @GetMapping("/{boardId}")
     @Operation(summary = "약관 단건 조회", description = "boardId로 약관을 조회합니다.")
-    public TermsEntity getTermsById(
+    public ResponseEntity<TermsEntity> getTermsById(
             @Parameter(description = "약관 ID", example = "1")
             @PathVariable Long boardId) {
-        return termsService.getTermsById(boardId);
+        return ResponseEntity.ok(termsService.getTermsById(boardId));
     }
 } 
