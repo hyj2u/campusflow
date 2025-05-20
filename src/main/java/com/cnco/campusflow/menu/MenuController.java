@@ -60,11 +60,11 @@ public class MenuController {
     }
 
     @Operation(
-            summary = "카테고리별 메뉴 조회",
+            summary = "매장 메뉴 조회",
             description = """
-                    카테고리의 메뉴 목록을 조회합니다.
+                    매장 메뉴 목록을 조회합니다.
                     
-                    * 카테고리 ID로 해당 카테고리의 메뉴를 조회합니다.
+                    * STore ID로 해당 카테고리와 메뉴를 조회합니다.
                     * 메뉴의 기본 정보와 옵션 정보를 포함합니다.
                     """
     )
@@ -73,12 +73,12 @@ public class MenuController {
             @ApiResponse(responseCode = "400", description = "잘못된 입력값"),
             @ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음")
     })
-    @GetMapping("/{categoryId}")
+    @GetMapping("/{storeId}")
     public ResponseEntity<CommonResponse<?>> getMenus(
-            @Parameter(description = "카테고리 번호", example = "24") @PathVariable Long categoryId
+            @Parameter(description = "매장 번호", example = "24") @PathVariable Long storeId
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CommonResponse.of(menuService.getMenus(categoryId)));
+                .body(CommonResponse.of(menuService.getMenus(storeId)));
     }
 
     @Operation(

@@ -55,11 +55,26 @@ public class MenuService {
                 .collect(Collectors.toList());
     }
 
-    public List<MenuProductResponseDto> getMenus(Long categoryId) {
-        return productRepository.findByCategoriesCategoryIdOrderByInsertTimestampDesc(categoryId)
-                .stream()
-                .map(this::convertProductToDto)
-                .collect(Collectors.toList());
+    public List<CategoryMenuResponseDto> getMenus(Long storeId) {
+        List<CategoryEntity> categories = categoryRepository.findAllByStoreStoreId(storeId);
+
+        return categories.stream().map(category -> {
+            List<ProductEntity> products = productRepository
+                    .findByCategoriesCategoryIdOrderByInsertTimestampDesc(category.getCategoryId());
+
+            List<MenuProductResponseDto> menuList = products.stream()
+                    .map(this::convertProductToDto)
+                    .collect(Collectors.toList());
+
+            CategoryMenuResponseDto dto = new CategoryMenuResponseDto();
+            dto.setCategoryId(category.getCategoryId());
+            dto.setCategoryNm(category.getCategoryNm());
+            dto.setOrderNum(category.getOrderNum());
+            dto.setBrandId(category.getBrand().getBrandId());
+            dto.setBrandNm(category.getBrand().getBrandNm());
+            dto.setMenuList(menuList);
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     public List<OptGrpResponseDto> getProductOptionGroups(Long productId) {
