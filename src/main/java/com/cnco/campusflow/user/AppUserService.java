@@ -39,6 +39,7 @@ public class AppUserService {
     private String imageBaseUrl;
 
 
+
     public AppUserEntity registerUser(AppUserDto dto, MultipartFile profileImg, MultipartFile collegeImg) throws IOException {
         if (appUserRepository.existsByUserId(dto.getUserId())) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
@@ -168,6 +169,16 @@ public class AppUserService {
         sendInfoEntity.setSentTm(LocalDateTime.now());
         sendInfoRepository.save(sendInfoEntity);
         return code;
+    }
+    public String chkPassword(PasswordDto passwordDto, AppUserEntity userEntity) {
+        if(passwordEncoder.matches(passwordDto.getPassword(), userEntity.getPassword())){
+            return "Y";
+        }
+        return "N";
+    }
+    public void changePassword(PasswordDto passwordDto, AppUserEntity userEntity) {
+        userEntity.setPassword(passwordEncoder.encode(passwordDto.getPassword()));
+        appUserRepository.save(userEntity);
     }
     public void verifyAndChangePhone(AppUserEntity user, PhoneVerifyDto phoneVerifyDto) {
         if (!phoneVerifyDto.getInputCode().equals(phoneVerifyDto.getSentCode())) {

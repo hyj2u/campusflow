@@ -33,14 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        //인증이 필요 없는 요청은 필터를 건너뜀
-        if (requestURI.equals("/user/signup") || 
-            requestURI.startsWith("/user/chk") || 
-            requestURI.equals("/user/login") || 
-            requestURI.equals("/user/refresh")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 

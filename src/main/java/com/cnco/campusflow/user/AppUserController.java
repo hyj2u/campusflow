@@ -189,7 +189,7 @@ public class AppUserController {
             """
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "인증 코드 발송 성공"),
+        @ApiResponse(responseCode = "201", description = "인증 코드 발송 성공"),
         @ApiResponse(responseCode = "400", description = "잘못된 전화번호 형식"),
         @ApiResponse(responseCode = "401", description = "인증되지 않은 접근")
     })
@@ -233,6 +233,55 @@ public class AppUserController {
         @RequestBody PhoneVerifyDto phoneVerifyDto
     ) {
         appUserService.verifyAndChangePhone(appUser, phoneVerifyDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @Operation(
+            summary = "비밀번호 확인 요청",
+            description = """
+            비밀번호 맞는지 확인
+            응답값에 맞는지 여부
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 확인 결과"),
+            @ApiResponse(responseCode = "400", description = "잘못된 전화번호 형식"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 접근")
+    })
+    @PostMapping("/chk/pass")
+    public ResponseEntity<?> checkPass(
+            @Parameter(
+                    description = "비밀번호 확인",
+                    required = true,
+                    schema = @Schema(implementation = PasswordDto.class)
+            )
+            @RequestBody PasswordDto passwordDto, @AuthenticationPrincipal AppUserEntity userDetails
+    ) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("matchYn", appUserService.chkPassword(passwordDto, userDetails));
+        return ResponseEntity.status(HttpStatus.OK).body(data);
+    }
+    @Operation(
+            summary = "비밀번호 변경 요청",
+            description = """
+            비밀번호 변경
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "비밀번호 변경 결과"),
+            @ApiResponse(responseCode = "400", description = "잘못된  형식"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 접근")
+    })
+    @PutMapping("/chg/pass")
+    public ResponseEntity<?> chgPass(
+            @Parameter(
+                    description = "비밀번호 확인",
+                    required = true,
+                    schema = @Schema(implementation = PasswordDto.class)
+            )
+            @RequestBody PasswordDto passwordDto, @AuthenticationPrincipal AppUserEntity userDetails
+    ) {
+        Map<String, Object> data = new HashMap<>();
+        appUserService.changePassword(passwordDto, userDetails);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
