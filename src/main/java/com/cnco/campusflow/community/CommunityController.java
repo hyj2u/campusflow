@@ -105,6 +105,24 @@ public class CommunityController {
         communityService.likeBoard(boardId, appUser);
         return ResponseEntity.noContent().build();
     }
+    @Operation(
+            summary = "게시글 좋아요 해제",
+            description = """
+                    특정 게시글 좋아요 해제.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 좋아요 취소"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력값입니다"),
+    })
+    @PutMapping("/{boardId}/unlike")
+    public ResponseEntity<?> unlikeBoard(
+            @Parameter(description = "게시글 번호", example = "2") @PathVariable Long boardId, @AuthenticationPrincipal AppUserEntity appUser
+    ) {
+        communityService.unlikeBoard(boardId, appUser);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @Operation(
             summary = "게시글 삭제",
@@ -179,6 +197,26 @@ public class CommunityController {
                 .body(CommonResponse.of(communityService.getReplies(boardId, order)));
     }
 
+    @Operation(
+            summary = "댓글 좋아요 해제",
+            description = """
+                    특정 댓글 좋아요 해제
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "댓글이 좋아요 해제 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력값입니다"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 접근입니다"),
+            @ApiResponse(responseCode = "403", description = "삭제 권한이 없습니다")
+    })
+    @PutMapping("/reply/{replyId}/unlike")
+    public ResponseEntity<?> unlikeReply(
+            @Parameter(description = "댓글 번호", example = "1") @PathVariable Long replyId,
+            @AuthenticationPrincipal AppUserEntity appuser
+    ) {
+        communityService.unlikeReply(replyId, appuser);
+        return ResponseEntity.noContent().build();
+    }
     @Operation(
             summary = "댓글 좋아요",
             description = """
@@ -382,15 +420,16 @@ public class CommunityController {
                     """
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 목록이 성공적으로 조회되었습니다"),
+            @ApiResponse(responseCode = "200", description = "댓글 목록이 성공적으로 조회되었습니다"),
             @ApiResponse(responseCode = "400", description = "잘못된 입력값입니다")
     })
     @GetMapping("/reply/my/like")
     public ResponseEntity<?> getRepliesWithMyLike(
             @AuthenticationPrincipal AppUserEntity user,
+
             @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CommonResponse.of(communityService.getBoardWithMyLikes(user, pageable)));
+                .body(CommonResponse.of(communityService.getRepliesWithMyLikes(user, pageable)));
     }
 }

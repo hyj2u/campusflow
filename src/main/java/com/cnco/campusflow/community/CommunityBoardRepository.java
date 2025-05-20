@@ -13,4 +13,5 @@ public interface CommunityBoardRepository extends JpaRepository<CommunityBoardEn
     Page<CommunityBoardEntity> findAllByAppUserOrderByInsertTimestampDesc(AppUserEntity appUser, Pageable pageable);
 
 
+
 }

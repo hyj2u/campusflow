@@ -280,7 +280,6 @@ public class AppUserController {
             )
             @RequestBody PasswordDto passwordDto, @AuthenticationPrincipal AppUserEntity userDetails
     ) {
-        Map<String, Object> data = new HashMap<>();
         appUserService.changePassword(passwordDto, userDetails);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

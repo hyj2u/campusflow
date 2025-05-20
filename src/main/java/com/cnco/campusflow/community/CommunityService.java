@@ -93,6 +93,13 @@ public class CommunityService {
 
         communityBoardRepository.save(boardEntity);
     }
+    public void unlikeBoard(Long boardId, AppUserEntity appUser) {
+        CommunityBoardEntity boardEntity = communityBoardRepository.findById(boardId).get();
+        boardEntity.setLikeCnt(boardEntity.getLikeCnt() - 1);
+        communityLikeRepository.deleteAllByBoardAndAppUser(boardEntity, appUser);
+        communityBoardRepository.save(boardEntity);
+    }
+
 
     public void deleteBoard(Long boardId) {
         replyRepository.deleteAllByBoardBoardId(boardId);
@@ -285,11 +292,18 @@ public class CommunityService {
         ReplyEntity replyEntity = replyRepository.findById(replyId).get();
         replyEntity.setLikeCnt(replyEntity.getLikeCnt() + 1);
         CommunityLikeEntity likeEntity = new CommunityLikeEntity();
-        likeEntity.setAppUser(replyEntity.getAppUser());
+        likeEntity.setAppUser(appUser);
         likeEntity.setReply(replyEntity);
         communityLikeRepository.save(likeEntity);
         replyRepository.save(replyEntity);
     }
+    public void unlikeReply(Long replyId, AppUserEntity appUser) {
+        ReplyEntity replyEntity = replyRepository.findById(replyId).get();
+        replyEntity.setLikeCnt(replyEntity.getLikeCnt() - 1);
+        communityLikeRepository.deleteAllByReplyAndAppUser(replyEntity, appUser);
+        replyRepository.save(replyEntity);
+    }
+
 
 
     private CommunityBoardResponseDto convertEntityToDto(CommunityBoardEntity boardEntity) {
