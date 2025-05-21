@@ -23,9 +23,6 @@ public class EventBoardEntity extends BaseEntity {
     private Long boardId;   // 게시글 번호
 
     @Column
-    private String title;   // 게시글 제목
-
-    @Column
     private String content;  // 게시글 내용
 
     @ManyToOne(fetch = FetchType.LAZY)

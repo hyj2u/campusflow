@@ -27,7 +27,6 @@ public class CsCenterReplyService {
         reply.setLikeCnt(0);
         reply.setDeleteYn("N");
         reply.setBlindYn("N");
-        reply.setHelpfulYn("N");
         CsCenterReplyEntity saved = replyRepository.save(reply);
         return toResponseDto(saved);
     }
@@ -62,15 +61,6 @@ public class CsCenterReplyService {
         return replies.stream().map(this::toResponseDto).collect(Collectors.toList());
     }
 
-    @Transactional
-    public CsCenterReplyResponseDto setHelpfulYn(Long replyId, String helpfulYn, AppUserEntity user) {
-        CsCenterReplyEntity reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
-        // 본인 또는 관리자만 변경 가능하게 하려면 조건 추가 가능
-        reply.setHelpfulYn(helpfulYn);
-        return toResponseDto(reply);
-    }
-
     private CsCenterReplyResponseDto toResponseDto(CsCenterReplyEntity entity) {
         return new CsCenterReplyResponseDto(
                 entity.getContent(),
@@ -81,8 +71,7 @@ public class CsCenterReplyService {
                 entity.getInsertTimestamp(),
                 entity.getReplyId(),
                 entity.getDeleteYn(),
-                entity.getBlindYn(),
-                entity.getHelpfulYn()
+                entity.getBlindYn()
         );
     }
 } 

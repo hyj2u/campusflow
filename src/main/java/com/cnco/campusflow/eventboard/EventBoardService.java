@@ -75,8 +75,6 @@ public class EventBoardService {
     private EventBoardResponseDto convertEntityToDto(EventBoardEntity eventEntity) {
         EventBoardResponseDto dto = new EventBoardResponseDto();
         dto.setBoardId(eventEntity.getBoardId());
-        dto.setTitle(eventEntity.getTitle());
-        dto.setContent(eventEntity.getContent());
         dto.setStartDate(eventEntity.getStartDate());
         dto.setEndDate(eventEntity.getEndDate());
         dto.setViewCnt(eventEntity.getViewCnt());

@@ -27,7 +27,6 @@ import java.util.List;
     example = """
         {
             "boardId": 1,
-            "title": "결제 오류 문의",
             "content": "결제 과정에서 오류가 발생했습니다.",
             "viewCnt": 150,
             "boardType": "QNA",
@@ -44,8 +43,7 @@ import java.util.List;
             "replies": [
                 {
                     "replyId": 1,
-                    "content": "문의하신 내용 확인했습니다.",
-                    "helpfulYn": "Y"
+                    "content": "문의하신 내용 확인했습니다."
                 }
             ]
         }
@@ -54,9 +52,6 @@ import java.util.List;
 public class CsCenterBoardResponseDto {
     @Schema(description = "게시글 ID", example = "1")
     private Long boardId;
-
-    // @Schema(description = "제목", example = "결제 오류 문의")
-    // private String title;
 
     @Schema(description = "내용", example = "결제 과정에서 오류가 발생했습니다.")
     private String content;
@@ -96,4 +91,35 @@ public class CsCenterBoardResponseDto {
 
     @Schema(description = "문의 유형 code_id", example = "10")
     private Long boardTypeCodeId;
+
+    @Schema(description = "문의 유형 code_cd", example = "ACCOUNT_LOGIN")
+    private String boardTypeCodeCd;
+
+    @Schema(
+        description = """
+            도움이 되었나요 여부
+            * Y: 도움이 됨
+            * N: 도움이 안 됨
+            """,
+        example = "Y",
+        allowableValues = {"Y", "N"}
+    )
+    private String helpfulYn;
+
+    @Schema(
+        description = """
+            삭제 여부
+            * Y: 삭제됨
+            * N: 삭제되지 않음
+            """,
+        example = "N",
+        allowableValues = {"Y", "N"}
+    )
+    private String deleteYn;
+
+    @Schema(description = "도움이 안된 이유", example = "답변이 불충분함")
+    private String noHelpfulReason;
+
+    @Schema(description = "답변처리 완료 여부", example = "Y", allowableValues = {"Y", "N"})
+    private String activeYn;
 } 

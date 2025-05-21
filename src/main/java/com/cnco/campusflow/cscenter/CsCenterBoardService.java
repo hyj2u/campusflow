@@ -47,6 +47,7 @@ public class CsCenterBoardService {
                 .appUser(appUser)
                 .boardType(codeEntity)
                 .viewCnt(0)
+                .deleteYn("N")
                 .build();
 
         // 이미지 처리
@@ -103,7 +104,8 @@ public class CsCenterBoardService {
     @Transactional
     public void deleteBoard(Long boardId) {
         CsCenterBoardEntity board = findById(boardId);
-        csCenterBoardRepository.delete(board);
+        board.setDeleteYn("Y");
+        csCenterBoardRepository.save(board);
     }
 
     @Transactional
@@ -151,6 +153,9 @@ public class CsCenterBoardService {
                 .viewCnt(entity.getViewCnt())
                 .boardType(entity.getBoardType() != null ? entity.getBoardType().getCodeNm() : null)
                 .boardTypeCodeId(entity.getBoardType() != null ? entity.getBoardType().getCodeId() : null)
+                .boardTypeCodeCd(entity.getBoardType() != null ? entity.getBoardType().getCodeCd() : null)
+                .helpfulYn(entity.getHelpfulYn())
+                .deleteYn(entity.getDeleteYn())
                 .nickname(entity.getAppUser() != null ? entity.getAppUser().getNickname() : null)
                 .appUserId(entity.getAppUser() != null ? entity.getAppUser().getAppUserId() : null)
                 .insertTimestamp(entity.getInsertTimestamp())
@@ -165,6 +170,8 @@ public class CsCenterBoardService {
                                 .toList()
                         : new ArrayList<>())
                 .replies(replies)
+                .noHelpfulReason(entity.getNoHelpfulReason())
+                .activeYn(entity.getActiveYn())
                 .build();
     }
 
@@ -180,5 +187,24 @@ public class CsCenterBoardService {
     @Transactional
     public void deleteById(Long id) {
         csCenterBoardRepository.deleteById(id);
+    }
+
+    @Transactional
+    public CsCenterBoardResponseDto setHelpfulYn(Long boardId, String helpfulYn, String noHelpfulReason, AppUserEntity user) {
+        CsCenterBoardEntity board = findById(boardId);
+        board.setHelpfulYn(helpfulYn);
+        if ("N".equalsIgnoreCase(helpfulYn)) {
+            board.setNoHelpfulReason(noHelpfulReason);
+        } else {
+            board.setNoHelpfulReason(null);
+        }
+        return convertToResponseDto(board);
+    }
+
+    @Transactional
+    public CsCenterBoardResponseDto setActiveYn(Long boardId, String activeYn, AppUserEntity user) {
+        CsCenterBoardEntity board = findById(boardId);
+        board.setActiveYn(activeYn);
+        return convertToResponseDto(board);
     }
 } 

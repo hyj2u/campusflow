@@ -33,6 +33,18 @@ public class CsCenterBoardEntity extends BaseEntity {
     @Column
     private Integer viewCnt;    // 조회(수)
 
+    @Column
+    private String helpfulYn;   // 도움이 되었나요 여부
+
+    @Column
+    private String deleteYn;    // 삭제 여부
+
+    @Column
+    private String noHelpfulReason;   // 도움이 안된 이유
+
+    @Column
+    private String activeYn;   // 답변처리 완료 여부
+
     @ManyToOne
     @JoinColumn(name = "code_id")
     private CodeEntity boardType;  // 문의 유형

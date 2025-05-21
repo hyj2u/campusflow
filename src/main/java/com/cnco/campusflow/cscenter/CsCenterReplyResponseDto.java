@@ -29,8 +29,7 @@ import java.time.LocalDateTime;
             "nickname": "관리자",
             "insertTimestamp": "2024-03-19T10:00:00",
             "deleteYn": "N",
-            "blindYn": "N",
-            "helpfulYn": "Y"
+            "blindYn": "N"
         }
         """
 )
@@ -77,15 +76,4 @@ public class CsCenterReplyResponseDto {
         allowableValues = {"Y", "N"}
     )
     private String blindYn;
-
-    @Schema(
-        description = """
-            도움이 되었나요 여부
-            * Y: 도움이 됨
-            * N: 도움이 안 됨
-            """,
-        example = "Y",
-        allowableValues = {"Y", "N"}
-    )
-    private String helpfulYn;
 } 
