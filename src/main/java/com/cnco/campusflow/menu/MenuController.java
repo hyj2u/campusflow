@@ -73,7 +73,7 @@ public class MenuController {
             @ApiResponse(responseCode = "400", description = "잘못된 입력값"),
             @ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음")
     })
-    @GetMapping("/{storeId}")
+    @GetMapping("/store/{storeId}")
     public ResponseEntity<CommonResponse<?>> getMenus(
             @Parameter(description = "매장 번호", example = "24") @PathVariable Long storeId
     ) {
