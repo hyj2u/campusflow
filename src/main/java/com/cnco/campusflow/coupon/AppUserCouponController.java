@@ -36,7 +36,6 @@ import java.util.List;
         * 쿠폰 사용 시 useYn이 'Y'로 변경되고 재사용이 불가능합니다.
         """
 )
-@SecurityRequirement(name = "bearerAuth")
 public class AppUserCouponController {
     private final AppUserCouponService appUserCouponService;
 
