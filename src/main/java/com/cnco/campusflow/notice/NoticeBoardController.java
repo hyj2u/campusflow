@@ -37,27 +37,17 @@ public class NoticeBoardController {
         summary = "공지사항 목록 조회",
         description = """
             공지사항 목록을 페이지네이션과 함께 조회합니다.
-            
-            * 페이지 번호는 0부터 시작합니다.
-            * 기본 페이지 크기는 10입니다.
-            * 기본 정렬은 등록일시 기준 내림차순입니다.
-            * 정렬 기준을 변경할 수 있습니다.
+            * page, size, sort 파라미터로 페이징/정렬 가능
+            * 예시: /notice/member?page=0&size=10&sort=insertTimestamp,desc
             """
     )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "공지사항 목록 조회 성공",
-            content = @Content(schema = @Schema(implementation = PaginatedResponse.class))
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "서버 내부 오류"
-        )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "공지사항 목록 조회 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     public PaginatedResponse<NoticeBoardResponseDto> getNotices(
-            @Parameter(hidden = true)
-            @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
+        @Parameter(hidden = true) @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         return noticeBoardService.getNotices(pageable);
     }
 

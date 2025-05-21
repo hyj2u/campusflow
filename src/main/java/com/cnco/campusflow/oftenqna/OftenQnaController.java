@@ -73,29 +73,19 @@ public class OftenQnaController {
         summary = "자주 묻는 질문 목록 조회",
         description = """
             자주 묻는 질문 목록을 조회합니다.
-            
-            * 카테고리별 필터링이 가능합니다.
-            * 페이지네이션을 지원합니다.
-            * 기본 페이지 크기는 10입니다.
-            * 기본 정렬은 등록일시 기준 내림차순입니다.
+            * category(카테고리)로 필터링 가능: PAYMENT, DELIVERY, PRODUCT, ETC
+            * 페이지네이션 지원 (page, size, sort)
+            * 예시: /oftenqna?category=PAYMENT&page=0&size=10&sort=insertTimestamp,desc
             """
     )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "자주 묻는 질문 목록 조회 성공",
-            content = @Content(schema = @Schema(implementation = PaginatedResponse.class))
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "서버 내부 오류"
-        )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "자주 묻는 질문 목록 조회 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     public ResponseEntity<CommonResponse<List<OftenQnaResponseDto>>> getQnas(
-            @Parameter(description = "카테고리 (선택사항)", example = "PAYMENT")
-            @RequestParam(required = false) String category,
-            @Parameter(hidden = true)
-            @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
+        @Parameter(description = "카테고리", example = "PAYMENT") @RequestParam(required = false) String category,
+        @Parameter(hidden = true) @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         PaginatedResponse<OftenQnaResponseDto> response;
         if (category != null) {
             response = oftenQnaService.getQnasByCategory(category, pageable);

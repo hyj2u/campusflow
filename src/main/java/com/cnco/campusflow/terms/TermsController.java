@@ -19,7 +19,10 @@ public class TermsController {
     private final TermsService termsService;
 
     @GetMapping
-    @Operation(summary = "전체 약관 목록 조회", description = "terms 테이블의 전체 레코드 내용을 조회합니다.")
+    @Operation(
+        summary = "전체 약관 목록 조회",
+        description = "terms 테이블의 전체 레코드 내용을 조회합니다."
+    )
     public ResponseEntity<CommonResponse<List<TermsEntity>>> getAllTerms() {
         return ResponseEntity.ok(CommonResponse.of(termsService.getAllTerms()));
     }

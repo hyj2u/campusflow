@@ -70,46 +70,21 @@ public class EventBoardController {
         summary = "이벤트 게시글 목록 조회",
         description = """
             이벤트 게시글 목록을 페이지네이션과 함께 조회합니다.
-            
-            * 페이지 번호는 0부터 시작합니다.
-            * 기본 페이지 크기는 10입니다.
-            * 기본 정렬은 등록일시 기준 내림차순입니다.
-            * 정렬 기준을 변경할 수 있습니다.
-            * storeId 파라미터를 입력하면 해당 매장에 매핑된 이벤트만 조회합니다.
-            * checkEndDate 파라미터를 입력하면 종료/진행중 이벤트만 조회합니다.
-            * page, size, sort 파라미터로 페이징 및 정렬이 가능합니다.
-            
-            예시: /event?storeId=1&checkEndDate=Y&page=0&size=5&sort=insertTimestamp,desc
+            * storeId(매장ID)로 매핑된 이벤트만 조회 가능
+            * checkEndDate(Y/N)로 종료/진행중 이벤트만 조회 가능
+            * page, size, sort 파라미터로 페이징/정렬 가능
+            * 예시: /event?storeId=1&checkEndDate=Y&page=0&size=5&sort=insertTimestamp,desc
             """
     )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "이벤트 게시글 목록 조회 성공",
-            content = @Content(schema = @Schema(implementation = PaginatedResponse.class))
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "서버 내부 오류"
-        )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "이벤트 게시글 목록 조회 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     public ResponseEntity<PaginatedResponse<EventBoardResponseDto>> getEvents(
-            @Parameter(description = "매장 ID (store_id)", example = "1", required = false)
-            @RequestParam(value = "storeId", required = false) Long storeId,
-            @Parameter(description = "이벤트 종료여부 (Y: 종료, N: 진행중)", example = "Y", required = false)
-            @RequestParam(value = "checkEndDate", required = false) String checkEndDate,
-            @Parameter(description = "페이지 번호(0부터 시작)", example = "0", required = false)
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @Parameter(description = "페이지 크기", example = "10", required = false)
-            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
-            @Parameter(description = "정렬 기준", example = "insertTimestamp,desc", required = false)
-            @RequestParam(value = "sort", required = false) String sort
+        @Parameter(description = "매장 ID(store_id)", example = "1") @RequestParam(required = false) Long storeId,
+        @Parameter(description = "이벤트 종료여부(Y: 종료, N: 진행중)", example = "Y") @RequestParam(required = false) String checkEndDate,
+        @Parameter(hidden = true) @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(
-            page != null ? page : 0,
-            size != null ? size : 10,
-            (sort != null && !sort.isEmpty()) ? org.springframework.data.domain.Sort.by(sort.split(",")[0]).descending() : org.springframework.data.domain.Sort.by("insertTimestamp").descending()
-        );
         return ResponseEntity.ok(eventBoardService.getEvents(pageable, storeId, checkEndDate));
     }
 } 

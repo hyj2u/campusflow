@@ -39,20 +39,18 @@ public class NewsController {
         summary = "오늘의 뉴스 조회",
         description = """
             오늘의 뉴스 정보를 조회합니다.
-            
-            * 활성화된 뉴스 URL을 반환합니다.
-            * 뉴스 정보는 관리자 페이지에서 관리됩니다.
-            * 페이징 파라미터: ?page=0&size=5
+            * page, size 파라미터로 페이징 가능
+            * 예시: /news?page=0&size=5
             """
     )
-    @ApiResponses(value = {
+    @ApiResponses({
         @ApiResponse(responseCode = "200", description = "뉴스 조회 성공"),
         @ApiResponse(responseCode = "400", description = "잘못된 입력값")
     })
     @GetMapping
     public ResponseEntity<CommonResponse<List<Map<String, Object>>>> getTodayNews(
-        @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-        @Parameter(description = "페이지 크기", example = "5") @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
+        @Parameter(description = "페이지 번호(0부터 시작)", example = "0") @RequestParam(defaultValue = "0") int page,
+        @Parameter(description = "페이지 크기", example = "5") @RequestParam(defaultValue = "10") int size
     ) {
         // 실제 서비스 로직에서 page, size를 활용하도록 수정 필요
         return ResponseEntity.status(HttpStatus.OK)
