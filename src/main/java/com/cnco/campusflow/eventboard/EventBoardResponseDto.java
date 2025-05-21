@@ -113,6 +113,11 @@ public class EventBoardResponseDto {
     )
     private String boardType;
 
+    @Schema(description = "게시글 유형 코드 (code_cd)", example = "EVENT")
+    private String boardTypeCodeCd;
+    @Schema(description = "게시글 유형 PK (code_id)", example = "101")
+    private Long boardTypeCodeId;
+
     @Schema(description = "작성자 닉네임", example = "관리자")
     private String nickname;
 
@@ -124,9 +129,6 @@ public class EventBoardResponseDto {
 
     @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile.jpg")
     private String profileImgUrl;
-
-    @Schema(description = "관련 매장 ID 목록", example = "[1, 2, 3]")
-    private List<Long> storeIds;
 
     @Schema(description = "이벤트 종료일이 지났는지 여부 (Y: 종료, N: 진행중)", example = "N", allowableValues = {"Y", "N"})
     private String endDateCheck;

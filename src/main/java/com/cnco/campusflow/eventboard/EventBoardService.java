@@ -38,28 +38,37 @@ public class EventBoardService {
         return dto;
     }
 
-    public PaginatedResponse<EventBoardResponseDto> getEvents(Pageable pageable) {
-        Page<EventBoardEntity> eventPage = eventBoardRepository.findAllByOrderByInsertTimestampDesc(pageable);
-
-        List<EventBoardResponseDto> eventDtos = eventPage.getContent().stream()
-                .map(entity -> {
-                    EventBoardResponseDto dto = convertEntityToDto(entity);
-                    LocalDate today = LocalDate.now();
-                    if (entity.getEndDate() != null && entity.getEndDate().isBefore(today)) {
-                        dto.setEndDateCheck("Y");
-                    } else {
-                        dto.setEndDateCheck("N");
-                    }
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
+    public PaginatedResponse<EventBoardResponseDto> getEvents(Pageable pageable, Long storeId, String checkEndDate) {
+        List<EventBoardEntity> eventEntities;
+        if (storeId != null) {
+            eventEntities = eventBoardRepository.findByStoreMappings_StoreId(storeId);
+        } else {
+            eventEntities = eventBoardRepository.findAll();
+        }
+        List<EventBoardResponseDto> filtered = eventEntities.stream()
+            .map(this::convertEntityToDto)
+            .peek(dto -> {
+                LocalDate today = LocalDate.now();
+                if (dto.getEndDate() != null && dto.getEndDate().isBefore(today)) {
+                    dto.setEndDateCheck("Y");
+                } else {
+                    dto.setEndDateCheck("N");
+                }
+            })
+            .filter(dto -> {
+                if (checkEndDate == null || checkEndDate.isEmpty()) return true;
+                return checkEndDate.equalsIgnoreCase(dto.getEndDateCheck());
+            })
+            .collect(Collectors.toList());
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+        List<EventBoardResponseDto> pageContent = (start > end) ? new ArrayList<>() : filtered.subList(start, end);
         return new PaginatedResponse<>(
-                eventDtos,
-                eventPage.getNumber(),
-                eventPage.getSize(),
-                eventPage.getTotalElements(),
-                eventPage.getTotalPages()
+            pageContent,
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            filtered.size(),
+            (int) Math.ceil((double) filtered.size() / pageable.getPageSize())
         );
     }
 
@@ -76,6 +85,8 @@ public class EventBoardService {
         dto.setFullExpYn(eventEntity.getFullExpYn());
         dto.setBrandId(eventEntity.getBrandId());
         dto.setBoardType(eventEntity.getBoardType() != null ? eventEntity.getBoardType().getCodeCd() : null);
+        dto.setBoardTypeCodeCd(eventEntity.getBoardType() != null ? eventEntity.getBoardType().getCodeCd() : null);
+        dto.setBoardTypeCodeId(eventEntity.getBoardType() != null ? eventEntity.getBoardType().getCodeId() : null);
         dto.setNickname(eventEntity.getAppUser().getNickname());
         dto.setAppUserId(eventEntity.getAppUser().getAppUserId());
 
@@ -92,13 +103,6 @@ public class EventBoardService {
 
         if (eventEntity.getAppUser().getProfileImg() != null) {
             dto.setProfileImgUrl(imageBaseUrl + "/" + eventEntity.getAppUser().getProfileImg().getImageId());
-        }
-
-        if (eventEntity.getStoreMappings() != null) {
-            List<Long> storeIds = eventEntity.getStoreMappings().stream()
-                    .map(EventBoardMappEntity::getStoreId)
-                    .collect(Collectors.toList());
-            dto.setStoreIds(storeIds);
         }
 
         return dto;
