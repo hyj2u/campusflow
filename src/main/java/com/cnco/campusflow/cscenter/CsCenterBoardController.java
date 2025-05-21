@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/cscenter")
@@ -35,6 +38,11 @@ import java.util.List;
         * 게시글은 등록일시 기준으로 정렬됩니다.
         * 각 게시글은 내용, 이미지, 등록일시 등의 정보를 포함합니다.
         * 댓글에 대한 도움이 되었나요(Y/N) 기능을 제공합니다.
+        * codeCd 가능한 값
+            - ACCOUNT_LOGIN - 로그인 관련
+            - ACCOUNT_AUTH - 인증 관련
+            - ACCOUNT_EXIT - 탈퇴 관련
+            - ACCOUNT_OTHER - 기타 계정 관련
         """
 )
 public class CsCenterBoardController {
@@ -42,20 +50,20 @@ public class CsCenterBoardController {
     private final CsCenterBoardService csCenterBoardService;
     private final CsCenterReplyService csCenterReplyService;
 
-    @PostMapping
+    @PostMapping(consumes = {"multipart/form-data"})
     @Operation(
         summary = "고객센터 게시글 생성",
         description = """
             새로운 고객센터 게시글을 생성합니다.
             
-            * 내용, 이미지 정보가 필요합니다.
+            * 내용과 문의 유형은 필수 입력 항목입니다.
             * 이미지는 선택사항입니다.
             * 생성된 게시글의 ID가 반환됩니다.
             """
     )
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "200",
+            responseCode = "201",
             description = "고객센터 게시글 생성 성공",
             content = @Content(schema = @Schema(implementation = CsCenterBoardResponseDto.class))
         ),
@@ -64,18 +72,35 @@ public class CsCenterBoardController {
             description = "잘못된 요청"
         ),
         @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않은 접근"
+        ),
+        @ApiResponse(
             responseCode = "500",
             description = "서버 내부 오류"
         )
     })
     public ResponseEntity<CsCenterBoardResponseDto> createBoard(
-            @Parameter(description = "고객센터 게시글 생성 요청")
-            @RequestPart("board") CsCenterBoardRequestDto requestDto,
+            @Parameter(description = "고객센터 게시글 생성 요청 (JSON 형식)")
+            @Schema(
+                type = "string",
+                format = "json",
+                example = """
+                    {
+                        "content": "로그인이 안됩니다.",
+                        "codeCd": "ACCOUNT_LOGIN"
+                    }
+                    """
+            )
+            @RequestPart("board") String board,
             @Parameter(description = "이미지 파일 목록 (선택사항)")
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser) throws IOException {
-        return ResponseEntity.ok(csCenterBoardService.createBoard(requestDto, appUser, images));
+        ObjectMapper objectMapper = new ObjectMapper();
+        CsCenterBoardRequestDto requestDto = objectMapper.readValue(board, CsCenterBoardRequestDto.class);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(csCenterBoardService.createBoard(requestDto, appUser, images));
     }
 
     @PutMapping("/{boardId}")
@@ -181,33 +206,33 @@ public class CsCenterBoardController {
         return ResponseEntity.ok(csCenterBoardService.getBoard(boardId));
     }
 
-    @GetMapping
-    @Operation(
-        summary = "고객센터 게시글 목록 조회",
-        description = """
-            고객센터 게시글 목록을 조회합니다.
+    // @GetMapping
+    // @Operation(
+    //     summary = "고객센터 게시글 목록 조회",
+    //     description = """
+    //         고객센터 게시글 목록을 조회합니다.
             
-            * 페이지네이션을 지원합니다.
-            * 기본 페이지 크기는 10입니다.
-            * 기본 정렬은 등록일시 기준 내림차순입니다.
-            """
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "고객센터 게시글 목록 조회 성공",
-            content = @Content(schema = @Schema(implementation = PaginatedResponse.class))
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "서버 내부 오류"
-        )
-    })
-    public ResponseEntity<PaginatedResponse<CsCenterBoardResponseDto>> getBoards(
-            @Parameter(hidden = true)
-            @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(csCenterBoardService.getBoards(pageable));
-    }
+    //         * 페이지네이션을 지원합니다.
+    //         * 기본 페이지 크기는 10입니다.
+    //         * 기본 정렬은 등록일시 기준 내림차순입니다.
+    //         """
+    // )
+    // @ApiResponses(value = {
+    //     @ApiResponse(
+    //         responseCode = "200",
+    //         description = "고객센터 게시글 목록 조회 성공",
+    //         content = @Content(schema = @Schema(implementation = PaginatedResponse.class))
+    //     ),
+    //     @ApiResponse(
+    //         responseCode = "500",
+    //         description = "서버 내부 오류"
+    //     )
+    // })
+    // public ResponseEntity<PaginatedResponse<CsCenterBoardResponseDto>> getBoards(
+    //         @Parameter(hidden = true)
+    //         @PageableDefault(size = 10, sort = "insertTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
+    //     return ResponseEntity.ok(csCenterBoardService.getBoards(pageable));
+    // }
 
     @GetMapping("/my")
     @Operation(
