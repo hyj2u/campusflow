@@ -20,4 +20,5 @@ public class AppUserProfileResponseDto {
     private Integer collegeId;
     private String collegeName;
     private String profileImgUrl;
+    private String barcode;
 }

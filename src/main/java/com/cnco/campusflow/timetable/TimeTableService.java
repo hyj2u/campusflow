@@ -72,6 +72,7 @@ public class TimeTableService {
 
     }
 
+
     public void changeTimeTableName(Long timeTableId, String name) {
         TimetableEntity timetable = timeTableRepository.findById(timeTableId).orElseThrow(() ->
                 new IllegalArgumentException("유효하지 않은 Table Id입니다."));

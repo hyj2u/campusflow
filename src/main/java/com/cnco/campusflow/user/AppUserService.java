@@ -91,6 +91,40 @@ public class AppUserService {
 
         return appUserRepository.save(user);
     }
+    public void changeUser(AppUserEntity user, AppUserDto dto, MultipartFile profileImg, MultipartFile collegeImg) throws IOException {
+        if (appUserRepository.existsByNickname(dto.getNickname())) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+        user.setNickname(dto.getNickname());
+        user.setCollegeAdmissionYear(dto.getCollegeAdmissionYear());
+        user.setMajor(dto.getMajor());
+        if(dto.getCollegeId() != null) {
+            // College 매핑
+            CollegeEntity college = collegeRepository.findById(dto.getCollegeId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 대학을 찾을 수 없습니다."));
+            user.setCollege(college);
+        }
+        // Profile 이미지 매핑
+        if(profileImg!=null) {
+            // 파일 저장
+            String fileName =fileUtil.saveFile(imageBasePath, profileImg);
+            // ImageEntity 생성 및 저장
+            ImageEntity imageEntity = new ImageEntity();
+            imageEntity.setImgNm(profileImg.getOriginalFilename());
+            imageEntity.setImgPath(imageBasePath + "/" + fileName);
+            user.setProfileImg(imageEntity);
+        }
+        // College 이미지 매핑
+        if (collegeImg != null) {
+            String fileName = fileUtil.saveFile(imageBasePath,collegeImg);
+            // ImageEntity 생성 및 저장
+            ImageEntity collegeImgEntity = new ImageEntity();
+            collegeImgEntity.setImgNm(collegeImg.getOriginalFilename());
+            collegeImgEntity.setImgPath(imageBasePath + "/" + fileName);
+            user.setCollegeImg(collegeImgEntity);
+        }
+
+    }
     public void chkId(String userId){
         if (appUserRepository.existsByUserId(userId)) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
@@ -126,6 +160,14 @@ public class AppUserService {
         refreshTokenRepository.save(refreshTokenEntity);
         return new TokenReponseDto(accessToken, refreshToken);
     }
+    public void logout(AppUserEntity appUser, FcmRequestDto fcmRequestDto) {
+        refreshTokenRepository.deleteAllByAppUserAndFcmToken(appUser, fcmRequestDto.getFcmToken());
+    }
+    public void deleteUser(AppUserEntity appUser, UserDeleteRequestDto userDeleteRequestDto) {
+        appUser.setUserStatus("D");
+        appUser.setDeleteReason(userDeleteRequestDto.getDeleteReason());
+        appUserRepository.save(appUser);
+    }
     public TokenReponseDto refreshToken(RefreshRequestDto request) {
         RefreshTokenEntity tokenEntity = refreshTokenRepository.findByToken(request.getRefreshToken())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 Refresh Token입니다."));
@@ -146,6 +188,7 @@ public class AppUserService {
         dto.setUserStatus(user.getUserStatus());
         dto.setAppUserId(user.getAppUserId());
         dto.setApproveStatus(user.getApproveStatus());
+        dto.setBarcode(user.getBarcode());
         if(user.getCollege()!=null){
             dto.setCollegeAdmissionYear(user.getCollegeAdmissionYear());
             dto.setMajor(user.getMajor());

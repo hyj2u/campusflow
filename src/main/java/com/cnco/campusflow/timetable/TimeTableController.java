@@ -55,9 +55,10 @@ public class TimeTableController {
     @Operation(
         summary = "강의 등록",
         description = """
-            새로운 강의를 등록합니다.
+            새로운 강의를 등록/수정합니다.
             
-            * 시간표에 강의를 추가합니다.
+            * 시간표에 강의를 추가 및 수정합니다.
+            * courseId가 있는 경우 수정 없는 경우 등록
             * 강의명, 요일, 장소, 시간, 교수, 색상 정보가 필요합니다.
             """
     )
@@ -72,6 +73,7 @@ public class TimeTableController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.of(timeTableService.registerCourse(request)));
     }
+
 
     @Operation(
         summary = "시간표명 변경",

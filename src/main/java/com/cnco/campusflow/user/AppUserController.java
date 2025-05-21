@@ -61,13 +61,44 @@ public class AppUserController {
             schema = @Schema(implementation = AppUserDto.class)
         )
         @RequestBody AppUserDto request,
-        @Parameter(description = "프로필 이미지 파일 (선택사항)")
+        @Parameter(description = "프로필 이미지 파일 (필수)")
         @RequestParam(required = false) MultipartFile profileImg,
         @Parameter(description = "대학 이미지 파일 (선택사항)")
         @RequestParam(required = false) MultipartFile collegeImg
     ) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.of(appUserService.registerUser(request, profileImg, collegeImg)));
+    }
+    @Operation(
+            summary = "회원정보 수정",
+            description = """
+            사용자정보를 수정합니다.
+            
+            * 프로필 이미지와 대학 이미지는 선택사항입니다.
+            * 아이디와 닉네임은 중복될 수 없습니다.
+            * 비밀번호는 암호화되어 저장됩니다.
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "수정 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (중복된 아이디/닉네임, 필수값 누락 등)"),
+            @ApiResponse(responseCode = "415", description = "지원하지 않는 이미지 형식")})
+    @PutMapping("/chg/profile")
+    public ResponseEntity<CommonResponse<?>> changeUser(
+            @Parameter(
+                    description = "사용자 정보 수정",
+                    required = true,
+                    schema = @Schema(implementation = AppUserDto.class)
+            )
+            @RequestBody AppUserDto request,
+            @Parameter(description = "프로필 이미지 파일 (필수)")
+            @RequestParam(required = false) MultipartFile profileImg,
+            @Parameter(description = "대학 이미지 파일 (선택사항)")
+            @RequestParam(required = false) MultipartFile collegeImg,
+            @AuthenticationPrincipal AppUserEntity appUserEntity
+    ) throws IOException {
+        appUserService.changeUser(appUserEntity, request, profileImg, collegeImg);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(
@@ -132,6 +163,45 @@ public class AppUserController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.of(appUserService.login(request)));
     }
+    @Operation(
+            summary = "로그아웃",
+            description = """
+            사용자 로그아웃
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "401", description = "잘못된 아이디 또는 비밀번호")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout( @Parameter(
+            description = "FCM Token 정보",
+            required = true,
+            schema = @Schema(implementation = FcmRequestDto.class)
+    ) @RequestBody FcmRequestDto request, @AuthenticationPrincipal AppUserEntity appUserEntity) {
+        appUserService.logout(appUserEntity, request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @Operation(
+            summary = "탈퇴",
+            description = """
+            사용자 탈퇴
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "탈퇴 성공"),
+            @ApiResponse(responseCode = "401", description = "잘못된 아이디 또는 비밀번호")
+    })
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete( @Parameter(
+            description = "삭제 요청",
+            required = true,
+            schema = @Schema(implementation = UserDeleteRequestDto.class)
+    ) @RequestBody UserDeleteRequestDto request, @AuthenticationPrincipal AppUserEntity appUserEntity) {
+        appUserService.deleteUser(appUserEntity, request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 
     @Operation(
         summary = "토큰 갱신",

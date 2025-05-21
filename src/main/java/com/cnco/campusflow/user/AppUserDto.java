@@ -14,6 +14,7 @@ import java.util.Date;
         description = """
         사용자 정보 DTO  
         - 회원가입 또는 사용자 정보 수정 시 사용됩니다.
+        - 수정시에는 nickname, collegeAdmissionYear, major, collegeId 필수
         """,
         example = """
         {

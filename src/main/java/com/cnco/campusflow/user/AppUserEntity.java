@@ -85,6 +85,8 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
     @Column
     private String userStatus;
     @Column
+    private String deleteReason;
+    @Column
     private String approveStatus;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "app_user_id") // timetable 테이블에 외래키 컬럼 생성
@@ -94,6 +96,9 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
     private LocalDateTime lastLoginDt;
     @Column
     private String collegeAdmissionYear;
+
+    @Column
+    private String barcode;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
