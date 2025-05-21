@@ -16,8 +16,9 @@ public class TermsService {
         return termsRepository.findAll();
     }
 
-    public TermsEntity getTermsById(Long boardId) {
-        return termsRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 약관입니다."));
-    }
+    //
+//    public TermsEntity getTermsById(Long boardId) {
+//        return termsRepository.findById(boardId)
+//                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 약관입니다."));
+//    }
 } 

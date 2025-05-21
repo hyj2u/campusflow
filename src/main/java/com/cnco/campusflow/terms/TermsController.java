@@ -24,11 +24,11 @@ public class TermsController {
         return ResponseEntity.ok(CommonResponse.of(termsService.getAllTerms()));
     }
 
-    @GetMapping("/{boardId}")
-    @Operation(summary = "약관 단건 조회", description = "boardId로 약관을 조회합니다.")
-    public ResponseEntity<TermsEntity> getTermsById(
-            @Parameter(description = "약관 ID", example = "1")
-            @PathVariable Long boardId) {
-        return ResponseEntity.ok(termsService.getTermsById(boardId));
-    }
+//    @GetMapping("/{boardId}")
+//    @Operation(summary = "약관 단건 조회", description = "boardId로 약관을 조회합니다.")
+//    public ResponseEntity<TermsEntity> getTermsById(
+//            @Parameter(description = "약관 ID", example = "1")
+//            @PathVariable Long boardId) {
+//        return ResponseEntity.ok(termsService.getTermsById(boardId));
+//    }
 } 
