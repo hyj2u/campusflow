@@ -93,4 +93,7 @@ public class CsCenterBoardResponseDto {
 
     @Schema(description = "댓글 목록")
     private List<CsCenterReplyResponseDto> replies;
+
+    @Schema(description = "문의 유형 code_id", example = "10")
+    private Long boardTypeCodeId;
 } 

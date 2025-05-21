@@ -150,6 +150,7 @@ public class CsCenterBoardService {
                 .content(entity.getContent())
                 .viewCnt(entity.getViewCnt())
                 .boardType(entity.getBoardType() != null ? entity.getBoardType().getCodeNm() : null)
+                .boardTypeCodeId(entity.getBoardType() != null ? entity.getBoardType().getCodeId() : null)
                 .nickname(entity.getAppUser() != null ? entity.getAppUser().getNickname() : null)
                 .appUserId(entity.getAppUser() != null ? entity.getAppUser().getAppUserId() : null)
                 .insertTimestamp(entity.getInsertTimestamp())
