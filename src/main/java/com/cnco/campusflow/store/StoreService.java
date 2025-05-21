@@ -32,6 +32,28 @@ public class StoreService {
         // FavoriteStore -> StoreListDto 변환
         return storeEntities.map(favorite -> convertToDto(favorite.getStore()));
     }
+    public StoreResponseDto getStoreDetail(Long storeId) {
+        StoreEntity store= storeRepository.findById(storeId).orElseThrow(EntityNotFoundException::new);
+        StoreResponseDto storeResponseDto = new StoreResponseDto();
+        storeResponseDto.setStorePasswd(store.getStorePasswd());
+        storeResponseDto.setStoreId(storeId);
+        storeResponseDto.setStoreStatus(store.getStoreStatus());
+        storeResponseDto.setAddressDtl(store.getAddressDtl());
+        storeResponseDto.setStoreNm(store.getStoreNm());
+        storeResponseDto.setAddressMain(store.getAddressMain());
+        storeResponseDto.setOwner(store.getOwner());
+        storeResponseDto.setDayCloseTm(store.getDayCloseTm());
+        storeResponseDto.setDayOpenTm(store.getDayOpenTm());
+        storeResponseDto.setDeliveryYn(store.getDeliveryYn());
+        storeResponseDto.setInhereYn(store.getInhereYn());
+        storeResponseDto.setSatCloseTm(store.getSatCloseTm());
+        storeResponseDto.setSatOpenTm(store.getSatOpenTm());
+        storeResponseDto.setSunCloseTm(store.getSunCloseTm());
+        storeResponseDto.setSunOpenTm(store.getSunOpenTm());
+        storeResponseDto.setTogoYn(store.getTogoYn());
+        storeResponseDto.setMainImgUrl(imageBaseUrl+"/"+store.getMainImg().getImageId());
+        return storeResponseDto;
+    }
 
     public StoreEntity addFavoriteStore(AppUserEntity appUser, Long storeId) {
         FavoriteStoreEntity favoriteStoreEntity = new FavoriteStoreEntity();

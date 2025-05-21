@@ -66,6 +66,25 @@ public class StoreController {
                 page.getTotalPages()     // 전체 페이지 수
         );
     }
+    @Operation(
+            summary = "매장 상세 조회",
+            description = """
+            선택한 매장정보를  조회합니다.
+            
+            * 선택한 매장 정보를 조회합니다.
+            * JWT 인증이 필요합니다.
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "즐겨찾기 매장 조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+    })
+    @GetMapping("/{storeId}")
+    public ResponseEntity<CommonResponse<?>> getMyStores(
+            @Parameter(description = "매장 번호", example = "15") @PathVariable Long storeId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.of(storeService.getStoreDetail(storeId)));
+    }
 
     @Operation(
         summary = "즐겨찾기 매장 조회",
@@ -112,7 +131,7 @@ public class StoreController {
     })
     @PostMapping("/favorite/{storeId}")
     public ResponseEntity<CommonResponse<?>> addFavoriteStore(
-        @Parameter(description = "인증된 사용자 정보") @AuthenticationPrincipal AppUserEntity appUser,
+        @AuthenticationPrincipal AppUserEntity appUser,
         @Parameter(description = "매장 번호", example = "15") @PathVariable Long storeId
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)

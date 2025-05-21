@@ -163,10 +163,6 @@ public class StoreEntity extends BaseEntity {
     @Schema(description = "예약 주문 가능 여부", example = "Y", allowableValues = {"Y", "N"})
     private String orderReservYn;
 
-    @Column
-    @Schema(description = "영업 여부", example = "Y", allowableValues = {"Y", "N"})
-    private String openYn;
-
     @ManyToOne
     @JoinColumn(name = "brand_id", nullable = false)
     @Schema(description = "브랜드 정보", example = """
@@ -210,5 +206,9 @@ public class StoreEntity extends BaseEntity {
     @Column
     @Schema(description = "매장 상태", example = "O", allowableValues = {"O", "W", "C"})
     private String storeStatus;
+
+    @Column
+    @Schema(description = "비밀번호", example = "O")
+    private String storePasswd;
 }
 

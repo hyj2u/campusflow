@@ -23,7 +23,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
     @Override
     public Page<StoreListDto> findStores(String search,  double latitude, double longitude, Pageable pageable) {
         BooleanBuilder whereClause = new BooleanBuilder();
-        whereClause.and(storeEntity.openYn.eq("Y"));
+        whereClause.and(storeEntity.storeStatus.eq("O"));
 
         if (search != null && !search.trim().isEmpty()) {
             BooleanBuilder searchCondition = new BooleanBuilder();
