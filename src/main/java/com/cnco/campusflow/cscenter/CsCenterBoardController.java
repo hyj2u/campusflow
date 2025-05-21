@@ -33,7 +33,7 @@ import java.util.List;
         * 게시글에 대한 댓글 기능을 제공합니다.
         * 페이지네이션을 지원하여 대량의 게시글을 효율적으로 조회할 수 있습니다.
         * 게시글은 등록일시 기준으로 정렬됩니다.
-        * 각 게시글은 제목, 내용, 이미지, 등록일시 등의 정보를 포함합니다.
+        * 각 게시글은 내용, 이미지, 등록일시 등의 정보를 포함합니다.
         * 댓글에 대한 도움이 되었나요(Y/N) 기능을 제공합니다.
         """
 )
@@ -48,7 +48,7 @@ public class CsCenterBoardController {
         description = """
             새로운 고객센터 게시글을 생성합니다.
             
-            * 제목, 내용, 이미지 정보가 필요합니다.
+            * 내용, 이미지 정보가 필요합니다.
             * 이미지는 선택사항입니다.
             * 생성된 게시글의 ID가 반환됩니다.
             """
@@ -84,7 +84,7 @@ public class CsCenterBoardController {
         description = """
             기존 고객센터 게시글을 수정합니다.
             
-            * 제목, 내용, 이미지 정보를 수정할 수 있습니다.
+            * 내용, 이미지 정보를 수정할 수 있습니다.
             * 이미지는 선택사항입니다.
             * 수정된 게시글의 정보가 반환됩니다.
             """
@@ -115,8 +115,7 @@ public class CsCenterBoardController {
             @RequestPart("board") CsCenterBoardRequestDto requestDto,
             @Parameter(description = "이미지 파일 목록 (선택사항)")
             @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
-        requestDto.setBoardId(boardId);
-        return ResponseEntity.ok(csCenterBoardService.updateBoard(requestDto, images));
+        return ResponseEntity.ok(csCenterBoardService.updateBoard(boardId, requestDto, images));
     }
 
     @DeleteMapping("/{boardId}")

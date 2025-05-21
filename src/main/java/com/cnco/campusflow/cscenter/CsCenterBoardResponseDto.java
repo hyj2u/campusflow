@@ -55,8 +55,8 @@ public class CsCenterBoardResponseDto {
     @Schema(description = "게시글 ID", example = "1")
     private Long boardId;
 
-    @Schema(description = "제목", example = "결제 오류 문의")
-    private String title;
+    // @Schema(description = "제목", example = "결제 오류 문의")
+    // private String title;
 
     @Schema(description = "내용", example = "결제 과정에서 오류가 발생했습니다.")
     private String content;

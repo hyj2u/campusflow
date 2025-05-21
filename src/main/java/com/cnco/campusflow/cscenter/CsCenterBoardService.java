@@ -14,9 +14,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.cnco.campusflow.common.FileUtil;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -25,16 +29,20 @@ public class CsCenterBoardService {
     private final ImageRepository imageRepository;
     private final CodeRepository codeRepository;
     private final CsCenterReplyService csCenterReplyService;
+    private final FileUtil fileUtil;
+    @Value("${image.base.path}")
+    private String imageBasePath;
+    @Value("${image.base.url}")
+    private String imageBaseUrl;
 
     @Transactional
-    public CsCenterBoardResponseDto createBoard(CsCenterBoardRequestDto requestDto, AppUserEntity appUser, List<MultipartFile> images) {
+    public CsCenterBoardResponseDto createBoard(CsCenterBoardRequestDto requestDto, AppUserEntity appUser, List<MultipartFile> images) throws IOException {
         // code_id 설정
-        CodeEntity codeEntity = codeRepository.findByCodeCd(requestDto.getType())
-                .orElseThrow(() -> new RuntimeException("Code not found for type: " + requestDto.getType()));
+        CodeEntity codeEntity = codeRepository.findByCodeCd(requestDto.getCodeCd())
+                .orElseThrow(() -> new RuntimeException("Code not found for type: " + requestDto.getCodeCd()));
 
         // 게시판 엔티티 생성
         CsCenterBoardEntity board = CsCenterBoardEntity.builder()
-                .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .appUser(appUser)
                 .boardType(codeEntity)
@@ -42,57 +50,53 @@ public class CsCenterBoardService {
                 .build();
 
         // 이미지 처리
-        List<ImageEntity> imageEntities = new ArrayList<>();
         if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
                 if (!image.isEmpty()) {
+                    String fileName = fileUtil.saveFile(imageBasePath, image);
                     ImageEntity imageEntity = new ImageEntity();
                     imageEntity.setImgNm(image.getOriginalFilename());
-                    // TODO: 실제 이미지 저장 경로 설정 필요
-                    imageEntity.setImgPath("/images/" + image.getOriginalFilename());
-                    imageEntities.add(imageEntity);
+                    imageEntity.setImgPath(imageBasePath + "/" + fileName);
+                    imageEntity.setBoard(board);
+                    imageRepository.save(imageEntity);
                 }
             }
         }
 
         // 게시판과 이미지 저장
-        CsCenterBoardEntity savedBoard = saveWithImages(board, imageEntities);
+        CsCenterBoardEntity savedBoard = csCenterBoardRepository.save(board);
         return convertToResponseDto(savedBoard);
     }
 
     @Transactional
-    public CsCenterBoardResponseDto updateBoard(CsCenterBoardRequestDto requestDto, List<MultipartFile> images) {
-        CsCenterBoardEntity board = findById(requestDto.getBoardId());
+    public CsCenterBoardResponseDto updateBoard(Long boardId, CsCenterBoardRequestDto requestDto, List<MultipartFile> images) throws IOException {
+        CsCenterBoardEntity board = findById(boardId);
         
         // code_id 설정
-        CodeEntity codeEntity = codeRepository.findByCodeCd(requestDto.getType())
-                .orElseThrow(() -> new RuntimeException("Code not found for type: " + requestDto.getType()));
+        CodeEntity codeEntity = codeRepository.findByCodeCd(requestDto.getCodeCd())
+                .orElseThrow(() -> new RuntimeException("Code not found for type: " + requestDto.getCodeCd()));
         
         // 게시판 정보 업데이트
-        board.setTitle(requestDto.getTitle());
         board.setContent(requestDto.getContent());
         board.setBoardType(codeEntity);
 
         // 이미지 처리
-        List<ImageEntity> imageEntities = new ArrayList<>();
         if (images != null && !images.isEmpty()) {
-            // 기존 이미지 삭제
             board.getImages().clear();
-            
-            // 새 이미지 추가
             for (MultipartFile image : images) {
                 if (!image.isEmpty()) {
+                    String fileName = fileUtil.saveFile(imageBasePath, image);
                     ImageEntity imageEntity = new ImageEntity();
                     imageEntity.setImgNm(image.getOriginalFilename());
-                    // TODO: 실제 이미지 저장 경로 설정 필요
-                    imageEntity.setImgPath("/images/" + image.getOriginalFilename());
-                    imageEntities.add(imageEntity);
+                    imageEntity.setImgPath(imageBasePath + "/" + fileName);
+                    imageEntity.setBoard(board);
+                    imageRepository.save(imageEntity);
                 }
             }
         }
 
         // 게시판과 이미지 저장
-        CsCenterBoardEntity updatedBoard = saveWithImages(board, imageEntities);
+        CsCenterBoardEntity updatedBoard = csCenterBoardRepository.save(board);
         return convertToResponseDto(updatedBoard);
     }
 
@@ -139,9 +143,10 @@ public class CsCenterBoardService {
 
     private CsCenterBoardResponseDto convertToResponseDto(CsCenterBoardEntity entity) {
         List<CsCenterReplyResponseDto> replies = csCenterReplyService != null ? csCenterReplyService.getReplies(entity.getBoardId(), "DESC") : new ArrayList<>();
+        // level 오름차순 정렬
+        replies.sort(Comparator.comparingInt(CsCenterReplyResponseDto::getLevel));
         return CsCenterBoardResponseDto.builder()
                 .boardId(entity.getBoardId())
-                .title(entity.getTitle())
                 .content(entity.getContent())
                 .viewCnt(entity.getViewCnt())
                 .boardType(entity.getBoardType() != null ? entity.getBoardType().getCodeNm() : null)
@@ -152,6 +157,7 @@ public class CsCenterBoardService {
                         ? entity.getImages().stream()
                                 .map(image -> ImageResponseDto.builder()
                                         .imageId(image.getImageId())
+                                        .imageUrl(imageBaseUrl + "/" + image.getImageId())
                                         .imgNm(image.getImgNm())
                                         .imgPath(image.getImgPath())
                                         .build())
@@ -159,20 +165,6 @@ public class CsCenterBoardService {
                         : new ArrayList<>())
                 .replies(replies)
                 .build();
-    }
-
-    @Transactional
-    public CsCenterBoardEntity saveWithImages(CsCenterBoardEntity board, List<ImageEntity> images) {
-        CsCenterBoardEntity savedEntity = csCenterBoardRepository.save(board);
-        
-        if (images != null && !images.isEmpty()) {
-            for (ImageEntity imageEntity : images) {
-                imageEntity.setBoard(savedEntity);
-                imageRepository.save(imageEntity);
-            }
-        }
-        
-        return savedEntity;
     }
 
     public CsCenterBoardEntity findById(Long id) {
