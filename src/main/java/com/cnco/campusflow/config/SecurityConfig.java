@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers( "/college/**",  "/image/**", "/menu/categories/**","/menu/*/dtl",
                         "/news/report/**","/push/list", "/store" ,"/notice/member/**","/terms/**", "/event/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/news/**", "/comm/free", "/comm/qna", "/oftenqna").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/news/**", "/comm/free", "/comm/qna", "/oftenqna", "/banner/**", "/banner-type/**").permitAll()
                         .requestMatchers("/user/signup", "/user/chk/nicknm","/user/chk/id", "/user/login", "/user/refresh").permitAll() // 로그인 & 토큰 갱신은 인증 없이 허용
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll() // Swagger UI 관련 경로 허용
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
