@@ -42,6 +42,7 @@ public class NewsController {
             
             * 활성화된 뉴스 URL을 반환합니다.
             * 뉴스 정보는 관리자 페이지에서 관리됩니다.
+            * 페이징 파라미터: ?page=0&size=5
             """
     )
     @ApiResponses(value = {
@@ -49,7 +50,11 @@ public class NewsController {
         @ApiResponse(responseCode = "400", description = "잘못된 입력값")
     })
     @GetMapping
-    public ResponseEntity<CommonResponse<List<Map<String, Object>>>> getTodayNews() {
+    public ResponseEntity<CommonResponse<List<Map<String, Object>>>> getTodayNews(
+        @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+        @Parameter(description = "페이지 크기", example = "5") @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
+    ) {
+        // 실제 서비스 로직에서 page, size를 활용하도록 수정 필요
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(newsService.getTodayNewsFlat()));
     }
