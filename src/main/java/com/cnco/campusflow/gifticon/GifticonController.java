@@ -1,6 +1,7 @@
 package com.cnco.campusflow.gifticon;
 
 import com.cnco.campusflow.common.PaginatedResponse;
+import com.cnco.campusflow.common.ErrorRespDto;
 import com.cnco.campusflow.user.AppUserEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -122,5 +123,55 @@ public class GifticonController {
             @AuthenticationPrincipal AppUserEntity currentUser) {
         gifticonService.createAppUserGifticons(requestDto, currentUser);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+        summary = "기프티콘 사용",
+        description = """
+            기프티콘을 사용합니다.
+            
+            * 본인의 기프티콘만 사용할 수 있습니다.
+            * 사용 가능한 기프티콘만 사용할 수 있습니다 (activeYn='Y', useYn='N').
+            * 만료되지 않은 기프티콘만 사용할 수 있습니다.
+            * 사용된 기프티콘은 재사용이 불가능합니다.
+            * 매장 ID는 기프티콘의 상품이 속한 매장과 일치해야 합니다.
+            """,
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "사용 성공",
+                content = @Content(schema = @Schema(implementation = AppUserGifticonResponseDto.class))
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "잘못된 요청 (기프티콘을 찾을 수 없음, 본인의 기프티콘이 아님, 사용할 수 없는 기프티콘, 만료된 기프티콘, 매장 불일치)",
+                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+            ),
+            @ApiResponse(
+                responseCode = "401",
+                description = "인증되지 않은 사용자",
+                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+            ),
+            @ApiResponse(
+                responseCode = "500",
+                description = "서버 오류",
+                content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+            )
+        }
+    )
+    @PostMapping("/{appUserGifticonId}/use")
+    public ResponseEntity<AppUserGifticonResponseDto> useGifticon(
+        @AuthenticationPrincipal AppUserEntity appUser,
+        @Parameter(
+            description = "사용자 기프티콘 ID",
+            example = "1",
+            required = true,
+            schema = @Schema(type = "integer", format = "int64")
+        ) @PathVariable Long appUserGifticonId
+    ) {
+        if (appUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(gifticonService.useGifticon(appUser, appUserGifticonId));
     }
 } 

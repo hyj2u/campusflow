@@ -109,4 +109,50 @@ public class GifticonService {
             throw new IllegalArgumentException("기프티콘 생성 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+    /**
+     * 기프티콘을 사용합니다.
+     */
+    public AppUserGifticonResponseDto useGifticon(AppUserEntity appUser, Long appUserGifticonId) {
+        AppUserGifticonEntity gifticon = appUserGifticonRepository.findById(appUserGifticonId)
+            .orElseThrow(() -> new IllegalArgumentException("기프티콘을 찾을 수 없습니다."));
+
+        // 본인 기프티콘인지 확인
+        if (gifticon.getReceiver() == null || !appUser.getAppUserId().equals(gifticon.getReceiver().getAppUserId())) {
+            throw new IllegalArgumentException("본인의 기프티콘만 사용할 수 있습니다.");
+        }
+
+        // 사용 가능한 기프티콘인지 확인
+        if (!"Y".equals(gifticon.getActiveYn()) || "Y".equals(gifticon.getUseYn())) {
+            throw new IllegalArgumentException("사용할 수 없는 기프티콘입니다.");
+        }
+
+        // 만료일 체크
+        LocalDateTime endDate = gifticon.getGifticon() != null ? 
+            gifticon.getGifticon().getEndDate() : gifticon.getEndDate();
+        if (endDate != null && endDate.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("만료된 기프티콘입니다.");
+        }
+
+        // 기프티콘 사용 처리
+        gifticon.setUseYn("Y");
+        return convertToDto(appUserGifticonRepository.save(gifticon));
+    }
+
+    private AppUserGifticonResponseDto convertToDto(AppUserGifticonEntity entity) {
+        return new AppUserGifticonResponseDto(
+            entity.getAppUserGifticonId(),
+            entity.getRegisterDate(),
+            entity.getUseYn(),
+            entity.getGifticon() != null ? entity.getGifticon().getEndDate() : entity.getEndDate(),
+            entity.getActiveYn(),
+            entity.getProduct().getProductId(),
+            entity.getProduct().getProductNm(),
+            entity.getProduct().getStore().getStoreNm(),
+            entity.getProduct().getStore().getStoreStatus(),
+            entity.getSender() != null ? entity.getSender().getAppUserId() : null,
+            entity.getSender() != null ? entity.getSender().getNickname() : null,
+            entity.getPurchaseAmount()
+        );
+    }
 } 
