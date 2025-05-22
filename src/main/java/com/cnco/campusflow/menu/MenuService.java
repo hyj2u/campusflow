@@ -76,6 +76,21 @@ public class MenuService {
             return dto;
         }).collect(Collectors.toList());
     }
+    public List<MenuProductResponseDto> getRecommendMenus(Long storeId) {
+        List<ProductEntity> products = productRepository.findAllByStoreStoreIdAndActiveYnOrderByInsertTimestampDesc(storeId, "Y")
+                .stream()
+                .filter(product -> product.getProductTags().stream()
+                        .anyMatch(tag -> {
+                            String tagNm = tag.getProductTagNm();
+                            return "BEST".equalsIgnoreCase(tagNm) || "HOT".equalsIgnoreCase(tagNm);
+                        })
+                )
+                .collect(Collectors.toList());
+
+        return products.stream()
+                .map(this::convertProductToDto)
+                .collect(Collectors.toList());
+    }
 
     public List<OptGrpResponseDto> getProductOptionGroups(Long productId) {
         ProductEntity product = productRepository.findById(productId)

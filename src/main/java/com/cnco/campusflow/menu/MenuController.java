@@ -80,6 +80,26 @@ public class MenuController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(menuService.getMenus(storeId)));
     }
+    @Operation(
+            summary = "매장 추천 메뉴 조회",
+            description = """
+                    매장 추천 메뉴 목록을 조회합니다.
+                    
+                    * STore ID로 해당 카테고리와 메뉴를 조회합니다.
+                    * 메뉴의 기본 정보와 옵션 정보를 포함합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추천 메뉴 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력값")
+    })
+    @GetMapping("/recommend/{storeId}")
+    public ResponseEntity<CommonResponse<?>> getRecomendMenus(
+            @Parameter(description = "매장 번호", example = "56") @PathVariable Long storeId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(menuService.getRecommendMenus(storeId)));
+    }
 
     @Operation(
             summary = "상품 옵션 그룹 조회",

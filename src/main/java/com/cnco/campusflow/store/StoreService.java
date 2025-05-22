@@ -51,7 +51,9 @@ public class StoreService {
         storeResponseDto.setSunCloseTm(store.getSunCloseTm());
         storeResponseDto.setSunOpenTm(store.getSunOpenTm());
         storeResponseDto.setTogoYn(store.getTogoYn());
-        storeResponseDto.setMainImgUrl(imageBaseUrl+"/"+store.getMainImg().getImageId());
+        if(store.getMainImg() != null) {
+            storeResponseDto.setMainImgUrl(imageBaseUrl+"/"+store.getMainImg().getImageId());
+        }
         return storeResponseDto;
     }
 
