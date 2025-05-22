@@ -48,7 +48,7 @@ public class CartEntity extends BaseEntity {
     @Schema(description = "장바구니 key", example = "1")
     private Long cartId;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(orphanRemoval = false)
     @JoinColumn(name = "cart_id")
     @Schema(description = "메뉴 정보", example = """
             {

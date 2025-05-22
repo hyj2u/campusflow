@@ -102,11 +102,11 @@ public class MenuController {
     }
 
     @Operation(
-            summary = "상품 옵션 그룹 조회",
+            summary = "상품 상세 및 옵션 그룹 조회",
             description = """
-                    상품의 옵션 그룹 목록을 조회합니다.
+                    상품의 상세와 옵션 그룹 목록을 조회합니다.
                     
-                    * 상품 ID로 해당 상품의 옵션 그룹을 조회합니다.
+                    * 상품 ID로 해당 상품 정보 옵션 그룹을 조회합니다.
                     * 옵션 그룹별 상세 옵션 정보를 포함합니다.
                     """
     )
@@ -119,9 +119,8 @@ public class MenuController {
     public ResponseEntity<?> getProductOptionGroups(
             @Parameter(description = "상품 번호", example = "1") @PathVariable Long productId
     ) {
-        List<OptGrpResponseDto> result = menuService.getProductOptionGroups(productId);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CommonResponse.of(result));
+                .body(CommonResponse.of( menuService.getProductDetail(productId)));
     }
 
     @Operation(
@@ -275,7 +274,7 @@ public class MenuController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
             @ApiResponse(responseCode = "404", description = "장바구니 메뉴를 찾을 수 없음")
     })
-    @DeleteMapping("/cart/{menuId}")
+    @DeleteMapping("/cart/menu/{menuId}")
     public ResponseEntity<?> deleteCartMenu(
             @Parameter(description = "메뉴 번호", example = "1") @PathVariable Long menuId
     ) throws JsonProcessingException {

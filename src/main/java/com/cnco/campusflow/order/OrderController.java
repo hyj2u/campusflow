@@ -161,10 +161,10 @@ public class OrderController {
     })
     @PostMapping
     public ResponseEntity<CommonResponse<?>> addOrder(
-        @Parameter(description = "주문 요청 정보") @RequestBody OrderRequestDto orderRequestDto
+        @Parameter(description = "주문 요청 정보") @RequestBody OrderRequestDto orderRequestDto, @AuthenticationPrincipal AppUserEntity appUser
     ) {
         Map<String, Object> data = new HashMap<>();
-        data.put("orderId", orderService.addOrder(orderRequestDto).getOrderId());
+        data.put("orderId", orderService.addOrder(orderRequestDto, appUser).getOrderId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.of(data));
     }
@@ -212,5 +212,24 @@ public class OrderController {
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.of(orderService.getOrderHistory(appUser)));
+    }
+    @Operation(
+            summary = "최근 주문 조회(3개)",
+            description = """
+            인증된 사용자의 최근주문한 내역을 조회합니다.
+            
+            * JWT 인증이 필요합니다.
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "주문 내역 조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+    })
+    @GetMapping("/recent")
+    public ResponseEntity<CommonResponse<?>> getRecentOrders(
+            @Parameter(description = "인증된 사용자 정보") @AuthenticationPrincipal AppUserEntity appUser
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.of(orderService.getRecentOrderMenus(appUser)));
     }
 }

@@ -1,9 +1,6 @@
 package com.cnco.campusflow.order;
 
-import com.cnco.campusflow.menu.MenuEntity;
-import com.cnco.campusflow.menu.MenuOptionDto;
-import com.cnco.campusflow.menu.MenuRepository;
-import com.cnco.campusflow.menu.MenuResponseDto;
+import com.cnco.campusflow.menu.*;
 import com.cnco.campusflow.user.AppUserEntity;
 import com.cnco.campusflow.user.AppUserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,14 +24,17 @@ public class OrderService {
     private final AppUserRepository appUserRepository;
     private final MenuRepository menuRepository;
     private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
 
     public ConsumerResponseDto addConsumerInfo(AppUserEntity appUser, ConsumerRequestDto consumerRequestDto) {
         ConsumerEntity consumerEntity;
-        if(consumerRepository.findById(consumerRequestDto.getConsumerId()).isPresent()) {
+        if(consumerRequestDto.getConsumerId() != null) {
                 consumerEntity = consumerRepository.findById(consumerRequestDto.getConsumerId()).get();
         }else{
             consumerEntity = new ConsumerEntity();
-            consumerEntity.setAppUser(appUser);
+            AppUserEntity managedUser = appUserRepository.findById(appUser.getAppUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+            consumerEntity.setAppUser(managedUser);
         }
         consumerEntity.setDeliveryDemand(consumerRequestDto.getDeliveryDemand());
         consumerEntity.setStoreDemand(consumerRequestDto.getStoreDemand());
@@ -107,7 +109,7 @@ public class OrderService {
         orderAddressRepository.deleteById(orderAddressId);
     }
 
-    public OrderEntity addOrder(OrderRequestDto orderRequestDto) {
+    public OrderEntity addOrder(OrderRequestDto orderRequestDto, AppUserEntity appUser) {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setOrderStatus("R");
         orderEntity.setConsumer(consumerRepository.findById(orderRequestDto.getConsumerId()).get());
@@ -117,6 +119,7 @@ public class OrderService {
         }
         orderEntity.setMenus(menuEntities);
         orderEntity.setTotalPrice(orderRequestDto.getTotalPrice());
+        cartRepository.deleteAllByAppUser(appUser);
         return orderRepository.save(orderEntity);
     }
 
@@ -133,6 +136,28 @@ public class OrderService {
         return orders.stream()
                 .map(this::toOrderResponseDto)
                 .collect(Collectors.toList());
+    }
+    public List<MenuResponseDto> getRecentOrderMenus(AppUserEntity appUser) {
+        List<OrderEntity> orders = orderRepository.findAllByConsumerAppUserAppUserIdOrderByOrderIdDesc(appUser.getAppUserId());
+
+        // 중복 제거를 위한 Map 사용 (menuId 기준)
+        Map<Long, MenuResponseDto> uniqueMenus = new LinkedHashMap<>();
+
+        for (OrderEntity order : orders) {
+            for (MenuEntity menu : order.getMenus()) {
+                Long menuId = menu.getMenuId();
+                if (!uniqueMenus.containsKey(menuId)) {
+                    MenuResponseDto dto = toMenuResponseDto(menu); // 메뉴 → DTO 변환
+                    uniqueMenus.put(menuId, dto);
+
+                    // 최대 3개 채우면 종료
+                    if (uniqueMenus.size() == 3) break;
+                }
+            }
+            if (uniqueMenus.size() == 3) break;
+        }
+
+        return new ArrayList<>(uniqueMenus.values());
     }
 
     private ConsumerResponseDto toConsumerResponseDto(ConsumerEntity consumer, AppUserEntity user) {
@@ -207,6 +232,36 @@ public class OrderService {
             dto.setStoreName(order.getMenus().get(0).getStore().getStoreNm());
         }
 
+        return dto;
+    }
+    private MenuResponseDto toMenuResponseDto(MenuEntity menu) {
+        MenuResponseDto dto = new MenuResponseDto();
+        dto.setMenuId(menu.getMenuId());
+        dto.setProductId(menu.getProduct().getProductId());
+        dto.setProductName(menu.getProduct().getProductNm());
+        dto.setStoreId(menu.getStore().getStoreId());
+        dto.setStoreName(menu.getStore().getStoreNm());
+        dto.setOrderCnt(menu.getOrderCnt());
+
+        List<MenuOptionDto> options = menu.getOptions().stream().map(option -> {
+            MenuOptionDto opt = new MenuOptionDto();
+            opt.setMenuOptId(option.getMenuOptId());
+            opt.setOptionId(option.getOptionEntity().getOptionId());
+            opt.setOptionNm(option.getOptionEntity().getOptionNm());
+            opt.setChosenNum(option.getChosenNum());
+            opt.setTotalPrice(option.getTotalPrice());
+            opt.setOptDtlId(option.getOptDtlEntity().getOptDtlId());
+            opt.setOptDtlNm(option.getOptDtlEntity().getOpDtlNm());
+            opt.setMin(option.getOptDtlEntity().getMin());
+            opt.setMax(option.getOptDtlEntity().getMax());
+            opt.setUnitPrice(option.getOptDtlEntity().getUnitPrice());
+            opt.setType(option.getOptDtlEntity().getType());
+            opt.setPrice(option.getOptDtlEntity().getPrice());
+            opt.setCodeNm(option.getOptionEntity().getCode().getCodeNm());
+            return opt;
+        }).collect(Collectors.toList());
+
+        dto.setOptions(options);
         return dto;
     }
 }

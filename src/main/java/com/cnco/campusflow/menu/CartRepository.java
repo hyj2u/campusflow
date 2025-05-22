@@ -7,4 +7,5 @@ public interface CartRepository extends JpaRepository<CartEntity, Long> {
 
     CartEntity findByAppUser(AppUserEntity appUser);
 
+    void deleteAllByAppUser(AppUserEntity appUser);
 }
