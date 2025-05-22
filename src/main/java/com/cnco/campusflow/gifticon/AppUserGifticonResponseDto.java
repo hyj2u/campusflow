@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
             "appUserGifticonId": 1,
             "productId": 1,
             "productNm": "아메리카노",
+            "storeId": 1,
             "storeNm": "강남점",
             "storeStatus": "O",
             "type": "GIFT",
@@ -77,6 +78,9 @@ public class AppUserGifticonResponseDto {
 
     @Schema(description = "상품명", example = "아메리카노")
     private String productNm;          // 상품명
+
+    @Schema(description = "매장 ID", example = "1")
+    private Long storeId;              // 매장 ID
 
     @Schema(description = "매장명", example = "강남점")
     private String storeNm;            // 매장명

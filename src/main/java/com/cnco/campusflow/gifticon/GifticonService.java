@@ -28,12 +28,12 @@ public class GifticonService {
     /**
      * 기프티콘 목록을 조회합니다.
      */
-    public Page<AppUserGifticonResponseDto> getGifticonList(AppUserEntity appUser, String activeYn, String type, Pageable pageable) {
+    public Page<AppUserGifticonResponseDto> getGifticonList(AppUserEntity appUser, String useYn, Long storeId, String type, Pageable pageable) {
         try {
-            log.info("기프티콘 목록 조회 시작 - userId: {}, type: {}, activeYn: {}", 
-                    appUser.getUserId(), type, activeYn);
+            log.info("기프티콘 목록 조회 시작 - userId: {}, type: {}, useYn: {}", 
+                    appUser.getUserId(), type, useYn);
             
-            Page<AppUserGifticonResponseDto> gifticons = appUserGifticonRepository.findAppUserGifticonList(appUser, activeYn, type, pageable);
+            Page<AppUserGifticonResponseDto> gifticons = appUserGifticonRepository.findAppUserGifticonList(appUser, useYn, storeId, type, pageable);
 
             log.info("기프티콘 목록 조회 완료 - 총 {}건", gifticons.getTotalElements());
             return new PageImpl<>(gifticons.getContent(), pageable, gifticons.getTotalElements());
@@ -148,6 +148,7 @@ public class GifticonService {
             entity.getActiveYn(),
             entity.getProduct().getProductId(),
             entity.getProduct().getProductNm(),
+            entity.getProduct().getStore().getStoreId(),
             entity.getProduct().getStore().getStoreNm(),
             entity.getProduct().getStore().getStoreStatus(),
             entity.getSender() != null ? entity.getSender().getAppUserId() : null,

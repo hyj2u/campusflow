@@ -27,7 +27,7 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<AppUserGifticonResponseDto> findAppUserGifticonList(AppUserEntity appUser, String activeYn, String type, Pageable pageable) {
+    public Page<AppUserGifticonResponseDto> findAppUserGifticonList(AppUserEntity appUser, String useYn, Long storeId, String type, Pageable pageable) {
         // 1. gifticon이 있는 경우 조회
         List<AppUserGifticonResponseDto> withGifticon = queryFactory
                 .select(Projections.constructor(AppUserGifticonResponseDto.class,
@@ -38,6 +38,7 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
                     gifticonEntity.activeYn,
                     productEntity.productId,
                     productEntity.productNm,
+                    storeEntity.storeId,
                     storeEntity.storeNm,
                     storeEntity.storeStatus,
                     appUserEntity.appUserId,
@@ -53,7 +54,9 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
                     appUserGifticonEntity.receiver.appUserId.eq(appUser.getAppUserId()),
                     appUserGifticonEntity.gifticon.isNotNull(),
                     typeEq(type),
-                    activeYnEq(activeYn)
+                    appUserGifticonEntity.activeYn.eq("Y"),
+                    useYnEq(useYn),
+                    storeIdEq(storeId)
                 )
                 .orderBy(appUserGifticonEntity.appUserGifticonId.desc())
                 .fetch();
@@ -68,6 +71,7 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
                     appUserGifticonEntity.activeYn,
                     productEntity.productId,
                     productEntity.productNm,
+                    storeEntity.storeId,
                     storeEntity.storeNm,
                     storeEntity.storeStatus,
                     appUserEntity.appUserId,
@@ -82,7 +86,9 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
                     appUserGifticonEntity.receiver.appUserId.eq(appUser.getAppUserId()),
                     appUserGifticonEntity.gifticon.isNull(),
                     typeEq(type),
-                    activeYnEq(activeYn)
+                    appUserGifticonEntity.activeYn.eq("Y"),
+                    useYnEq(useYn),
+                    storeIdEq(storeId)
                 )
                 .orderBy(appUserGifticonEntity.appUserGifticonId.desc())
                 .fetch();
@@ -105,7 +111,9 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
                 .where(
                     appUserGifticonEntity.receiver.appUserId.eq(appUser.getAppUserId()),
                     typeEq(type),
-                    activeYnEq(activeYn)
+                    appUserGifticonEntity.activeYn.eq("Y"),
+                    useYnEq(useYn),
+                    storeIdEq(storeId)
                 )
                 .fetchOne();
 
@@ -125,16 +133,24 @@ public class CustomGifticonRepositoryImpl implements CustomGifticonRepository {
         return null;
     }
 
-    private BooleanExpression activeYnEq(String activeYn) {
-        if (!StringUtils.hasText(activeYn)) {
+    private BooleanExpression useYnEq(String useYn) {
+        if (!StringUtils.hasText(useYn)) {
             return null;
         }
-        if ("Y".equals(activeYn)) {
-            return appUserGifticonEntity.activeYn.eq("Y");
+        if ("Y".equals(useYn)) {
+            return appUserGifticonEntity.useYn.eq("Y");
         }
-        if ("N".equals(activeYn)) {
-            return appUserGifticonEntity.activeYn.eq("N");
+        if ("N".equals(useYn)) {
+            return appUserGifticonEntity.useYn.eq("N");
         }
         return null;
+    }
+
+    private BooleanExpression storeIdEq(Long storeId) {
+        if (storeId == null) {
+            return null;
+        }
+        
+        return appUserGifticonEntity.product.store.storeId.eq(storeId);
     }
 } 

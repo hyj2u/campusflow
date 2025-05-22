@@ -68,14 +68,16 @@ public class GifticonController {
     @GetMapping
     public PaginatedResponse<AppUserGifticonResponseDto> getGifticonList(
             @AuthenticationPrincipal AppUserEntity appUser,
-            @Parameter(description = "사용 가능 여부 (Y/N)", example = "Y")
-            @RequestParam(required = false) String activeYn,
+            @Parameter(description = "기프티콘 사용 여부 (Y/N)", example = "N")
+            @RequestParam(required = false) String useYn,
+            @Parameter(description = "매장 ID", example = "1")
+            @RequestParam(required = false) Long storeId,
             @Parameter(description = "기프티콘 타입 (PURCHASE/GIFT)", example = "PURCHASE")
             @RequestParam(required = false) String type,
             @Parameter(hidden = true)
             @PageableDefault(size = 10, sort = "appUserGifticonId", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<AppUserGifticonResponseDto> gifticons = gifticonService.getGifticonList(appUser, activeYn, type, pageable);
+        Page<AppUserGifticonResponseDto> gifticons = gifticonService.getGifticonList(appUser, useYn, storeId, type, pageable);
 
         return new PaginatedResponse<>(
                 gifticons.getContent(),
