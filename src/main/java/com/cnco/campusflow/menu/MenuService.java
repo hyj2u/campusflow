@@ -76,8 +76,23 @@ public class MenuService {
             return dto;
         }).collect(Collectors.toList());
     }
+    public List<MenuProductResponseDto> getRecommendMenus(Long storeId) {
+        List<ProductEntity> products = productRepository.findAllByStoreStoreIdAndActiveYnOrderByInsertTimestampDesc(storeId, "Y")
+                .stream()
+                .filter(product -> product.getProductTags().stream()
+                        .anyMatch(tag -> {
+                            String tagNm = tag.getProductTagNm();
+                            return "BEST".equalsIgnoreCase(tagNm) || "HOT".equalsIgnoreCase(tagNm);
+                        })
+                )
+                .collect(Collectors.toList());
 
-    public List<OptGrpResponseDto> getProductOptionGroups(Long productId) {
+        return products.stream()
+                .map(this::convertProductToDto)
+                .collect(Collectors.toList());
+    }
+
+    public MenuProductDtlResponseDto getProductDetail(Long productId) {
         ProductEntity product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
@@ -87,19 +102,36 @@ public class MenuService {
         Map<Long, List<OptionEntity>> groupMap = options.stream()
                 .collect(Collectors.groupingBy(opt -> opt.getOptGrp().getOptGrpId()));
 
-        return optGrps.stream()
+        List<OptGrpResponseDto> optGrpDtos = optGrps.stream()
                 .map(grp -> {
                     OptGrpResponseDto grpDto = new OptGrpResponseDto();
                     grpDto.setOptGrpId(grp.getOptGrpId());
                     grpDto.setOptGrpNm(grp.getOptGrpNm());
                     grpDto.setOrderNum(grp.getOrderNum());
+
                     List<OptionResponseDto> optionDtos = groupMap.getOrDefault(grp.getOptGrpId(), List.of())
-                            .stream().map(this::toOptionDto).collect(Collectors.toList());
+                            .stream()
+                            .map(this::toOptionDto)
+                            .collect(Collectors.toList());
+
                     grpDto.setOptions(optionDtos);
                     return grpDto;
                 }).collect(Collectors.toList());
-    }
 
+        // 메인 이미지 URL 생성
+        String imageUrl = null;
+        if (product.getMainImg() != null) {
+            imageUrl = imageBaseUrl + "/" + product.getMainImg().getImageId();
+        }
+
+        return new MenuProductDtlResponseDto(
+                product.getProductId(),
+                product.getProductNm(),
+                product.getPrice(),
+                imageUrl,
+                optGrpDtos
+        );
+    }
     public FavoriteMenuResponseDto addFavoriteMenu(MenuRequestDto menuRequestDto, AppUserEntity appUser) throws JsonProcessingException {
         log.info(objectMapper.writeValueAsString(menuRequestDto));
 

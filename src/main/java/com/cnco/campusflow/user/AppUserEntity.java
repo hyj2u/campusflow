@@ -99,7 +99,8 @@ public class AppUserEntity extends BaseEntity implements UserDetails {
 
     @Column
     private String barcode;
-
+    @Column
+    private String defaultProfileUrl;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));

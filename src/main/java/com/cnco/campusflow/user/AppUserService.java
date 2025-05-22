@@ -78,6 +78,8 @@ public class AppUserService {
             imageEntity.setImgNm(profileImg.getOriginalFilename());
             imageEntity.setImgPath(imageBasePath + "/" + fileName);
             user.setProfileImg(imageEntity);
+        }else{
+            user.setDefaultProfileUrl(dto.getDefaultProfileUrl());
         }
         // College 이미지 매핑
         if (collegeImg != null) {
@@ -113,6 +115,9 @@ public class AppUserService {
             imageEntity.setImgNm(profileImg.getOriginalFilename());
             imageEntity.setImgPath(imageBasePath + "/" + fileName);
             user.setProfileImg(imageEntity);
+            user.setDefaultProfileUrl(null);
+        } else  {
+            user.setDefaultProfileUrl(dto.getDefaultProfileUrl());
         }
         // College 이미지 매핑
         if (collegeImg != null) {

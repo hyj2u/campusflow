@@ -7,4 +7,6 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<OrderEntity, Long>{
 
     List<OrderEntity> findTop10ByConsumerAppUserAppUserIdOrderByOrderIdDesc(Long appUserId);
+
+    List<OrderEntity> findAllByConsumerAppUserAppUserIdOrderByOrderIdDesc(Long appUserId);
 }

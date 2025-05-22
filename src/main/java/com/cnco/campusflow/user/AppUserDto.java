@@ -26,7 +26,8 @@ import java.util.Date;
           "collegeId": 1,
           "phone": "01012345678",
           "username": "길동이",
-          "birthday": "2000-01-01"
+          "birthday": "2000-01-01",
+          "defaultProfileUrl" : "www.exmaple.com"
         }
         """
 )
@@ -59,5 +60,7 @@ public class AppUserDto {
 
     @Schema(description = "생년월일", example = "2000-01-01")
     private Date birthday;
+    @Schema(description = "기본 프로필 이미지 URL", example = "www.example.com")
+    private String defaultProfileUrl;
 }
 

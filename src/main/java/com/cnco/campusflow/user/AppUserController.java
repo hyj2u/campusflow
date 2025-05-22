@@ -61,7 +61,7 @@ public class AppUserController {
             schema = @Schema(implementation = AppUserDto.class)
         )
         @RequestBody AppUserDto request,
-        @Parameter(description = "프로필 이미지 파일 (필수)")
+        @Parameter(description = "프로필 이미지 파일 (선택)")
         @RequestParam(required = false) MultipartFile profileImg,
         @Parameter(description = "대학 이미지 파일 (선택사항)")
         @RequestParam(required = false) MultipartFile collegeImg
@@ -91,7 +91,7 @@ public class AppUserController {
                     schema = @Schema(implementation = AppUserDto.class)
             )
             @RequestBody AppUserDto request,
-            @Parameter(description = "프로필 이미지 파일 (필수)")
+            @Parameter(description = "프로필 이미지 파일 (선택)")
             @RequestParam(required = false) MultipartFile profileImg,
             @Parameter(description = "대학 이미지 파일 (선택사항)")
             @RequestParam(required = false) MultipartFile collegeImg,
