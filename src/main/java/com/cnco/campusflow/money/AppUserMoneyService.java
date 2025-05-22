@@ -175,4 +175,36 @@ public class AppUserMoneyService {
         }
         return appUserMoneyRepository.findByAppUserOrderByAppUserMoneyIdDesc(appUser, pageable);
     }
+
+    @Transactional
+    public AppUserMoneyEntity cancelMoney(AppUserEntity appUser, StoreEntity store, Integer amount, String note) {
+        // 현재 활성화된 머니 내역 조회
+        List<AppUserMoneyEntity> currentMoneyList = getUserMoneyList(appUser);
+        AppUserMoneyEntity currentMoney = currentMoneyList.isEmpty() ? 
+            AppUserMoneyEntity.builder()
+                .appUser(appUser)
+                .currentMoney(0)
+                .totalMoney(0)
+                .build() : 
+            currentMoneyList.get(0);
+
+        // 기존 머니 내역이 있으면 종료 처리
+        if (currentMoney.getAppUserMoneyId() != null) {
+            currentMoney.setEndTimestamp(LocalDateTime.now());
+            appUserMoneyRepository.save(currentMoney);
+        }
+
+        // 새로운 머니 내역 생성
+        AppUserMoneyEntity newMoney = AppUserMoneyEntity.builder()
+                .appUser(appUser)
+                .store(store)
+                .currentMoney(currentMoney.getCurrentMoney() + amount)  // 현재 머니 잔액 증가
+                .totalMoney(currentMoney.getTotalMoney())  // 총 머니는 유지
+                .amount(-amount)  // 음수로 설정
+                .type("CANCEL")
+                .note(note)
+                .build();
+
+        return appUserMoneyRepository.save(newMoney);
+    }
 } 

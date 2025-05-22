@@ -34,7 +34,7 @@ import java.util.List;
     description = """
         사용자 머니 관리 API
         
-        * 사용자의 머니 적립, 사용, 선물 기능을 제공합니다.
+        * 사용자의 머니 적립, 사용, 선물, 취소 기능을 제공합니다.
         * 머니 사용 이력을 조회할 수 있습니다.
         * 모든 API는 인증된 사용자만 접근 가능합니다.
         * 머니는 1원 이상의 정수값만 사용 가능합니다.
@@ -124,7 +124,7 @@ public class AppUserMoneyController {
     })
     public ResponseEntity<AppUserMoneyEntity> earnMoney(
             @Parameter(description = "머니 적립 요청")
-            @Valid @RequestBody AppUserMoneyEarnRequestDto requestDto,
+            @Valid @RequestBody AppUserMoneyRequestDto requestDto,
             @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser) {
         if (appUser == null) {
@@ -174,11 +174,15 @@ public class AppUserMoneyController {
     })
     public ResponseEntity<AppUserMoneyEntity> useMoney(
             @Parameter(description = "머니 사용 요청")
-            @Valid @RequestBody AppUserMoneyUseRequestDto requestDto,
+            @Valid @RequestBody AppUserMoneyRequestDto requestDto,
             @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser) {
         if (appUser == null) {
             return ResponseEntity.status(401).build();
+        }
+
+        if (requestDto.getStoreId() == null) {
+            return ResponseEntity.badRequest().build();
         }
 
         StoreEntity store = storeRepository.findById(requestDto.getStoreId())
@@ -237,9 +241,13 @@ public class AppUserMoneyController {
             @Parameter(description = "인증된 사용자 정보", hidden = true)
             @AuthenticationPrincipal AppUserEntity appUser,
             @Parameter(description = "머니 선물 요청")
-            @RequestBody AppUserMoneyGiftRequestDto requestDto) {
+            @Valid @RequestBody AppUserMoneyRequestDto requestDto) {
         if (appUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (requestDto.getAppUserId() == null) {
+            return ResponseEntity.badRequest().build();
         }
 
         AppUserEntity receiver = appUserRepository.findByAppUserId(requestDto.getAppUserId())
@@ -248,7 +256,7 @@ public class AppUserMoneyController {
         AppUserMoneyEntity result = appUserMoneyService.giftMoney(
                 appUser,
                 receiver,
-                requestDto.getAmount(),
+                requestDto.getAmount().longValue(),
                 requestDto.getNote()
         );
 
@@ -310,5 +318,50 @@ public class AppUserMoneyController {
                 moneyHistory.getTotalElements(),
                 moneyHistory.getTotalPages()
         ));
+    }
+
+    @PostMapping("/cancel")
+    @Operation(
+        summary = "머니 취소",
+        description = """
+            사용자의 머니를 취소합니다.
+            
+            * 취소할 머니는 1원 이상이어야 합니다.
+            * 현재 보유한 머니보다 많이 취소할 수 없습니다.
+            * 머니 취소 시 메모를 남길 수 있습니다.
+            * 머니 취소 후 현재 보유 머니가 증가합니다.
+            * 총 적립 머니는 변동되지 않습니다.
+            * 인증되지 않은 사용자는 401 에러를 반환합니다.
+            """
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "취소 성공",
+            content = @Content(schema = @Schema(implementation = AppUserMoneyEntity.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 (머니 부족 등)",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않은 사용자",
+            content = @Content(schema = @Schema(implementation = ErrorRespDto.class))
+        )
+    })
+    public ResponseEntity<AppUserMoneyEntity> cancelMoney(
+            @Parameter(description = "머니 취소 요청")
+            @Valid @RequestBody AppUserMoneyRequestDto requestDto,
+            @Parameter(description = "인증된 사용자 정보", hidden = true)
+            @AuthenticationPrincipal AppUserEntity appUser) {
+        if (appUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        AppUserMoneyEntity moneyEntity = appUserMoneyService.cancelMoney(
+                appUser, null, requestDto.getAmount(), requestDto.getNote());
+        return ResponseEntity.ok(moneyEntity);
     }
 } 
