@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -74,7 +73,7 @@ public class AppUserCouponController {
         @AuthenticationPrincipal AppUserEntity appUser,
         @Parameter(description = "활성화 여부 (Y/N, null 허용)") @RequestParam(required = false) String activeYn,
         @Parameter(description = "사용 여부 (Y/N, null 허용)") @RequestParam(required = false) String useYn,
-        @PageableDefault(sort = "endDate", direction = Sort.Direction.ASC) Pageable pageable
+        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     ) {
         return ResponseEntity.ok(appUserCouponService.getCouponList(appUser, activeYn, useYn, pageable));
     }
