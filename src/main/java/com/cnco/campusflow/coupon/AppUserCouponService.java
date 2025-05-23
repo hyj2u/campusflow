@@ -4,11 +4,13 @@ import com.cnco.campusflow.coupon.AppUserCouponRegisterRequestDto;
 import com.cnco.campusflow.coupon.AppUserCouponResponseDto;
 import com.cnco.campusflow.coupon.AppUserCouponUseRequestDto;
 import com.cnco.campusflow.user.AppUserEntity;
+import com.cnco.campusflow.user.AppUserRepository;
 import com.cnco.campusflow.coupon.CouponEntity;
 import com.cnco.campusflow.coupon.CouponRepository;
 import com.cnco.campusflow.coupon.CouponGenEntity;
 import com.cnco.campusflow.coupon.CouponGenRepository;
 import com.cnco.campusflow.common.PaginatedResponse;
+import com.cnco.campusflow.money.AppUserMoneyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,10 +29,12 @@ public class AppUserCouponService {
     private final AppUserCouponRepository appUserCouponRepository;
     private final CouponRepository couponRepository;
     private final CouponGenRepository couponGenRepository;
+    private final AppUserMoneyService appUserMoneyService;
+    private final AppUserRepository appUserRepository;
 
     @Transactional(readOnly = true)
-    public PaginatedResponse<AppUserCouponResponseDto> getCouponList(AppUserEntity appUser, Pageable pageable) {
-        Page<AppUserCouponResponseDto> page = appUserCouponRepository.findAppUserCouponList(appUser, "Y", "N", pageable);
+    public PaginatedResponse<AppUserCouponResponseDto> getCouponList(AppUserEntity appUser, String activeYn, String useYn, Pageable pageable) {
+        Page<AppUserCouponResponseDto> page = appUserCouponRepository.findAppUserCouponList(appUser, activeYn, useYn, pageable);
         
         return new PaginatedResponse<>(
             page.getContent(),
@@ -75,7 +79,20 @@ public class AppUserCouponService {
 
         // 쿠폰 사용 처리
         coupon.setUseYn("Y");
-        return convertToDto(appUserCouponRepository.save(coupon));
+        appUserCouponRepository.save(coupon);
+
+        // 머니 선물 처리
+        AppUserEntity sender = appUserRepository.findById(1L)
+            .orElseThrow(() -> new IllegalArgumentException("시스템 사용자를 찾을 수 없습니다."));
+            
+        appUserMoneyService.giftMoney(
+            sender,  // 보내는 사람 (시스템 사용자)
+            appUser,  // 받는 사람 (쿠폰 사용자)
+            coupon.getCouponAmount().longValue(),  // 쿠폰 금액
+            "쿠폰 적용: " + getCouponName(coupon)  // 메모
+        );
+
+        return convertToDto(coupon);
     }
 
     private LocalDateTime getEndDateTime(AppUserCouponEntity coupon) {

@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -45,7 +46,9 @@ public class AppUserCouponController {
         description = """
             사용자의 쿠폰 목록을 조회합니다.
             
-            - 사용 가능한 쿠폰만 조회됩니다 (activeYn='Y', useYn='N', endDate >= now())
+            - activeYn과 useYn 파라미터로 쿠폰 상태를 필터링할 수 있습니다.
+            - activeYn: 활성화 여부 (Y/N, null 허용)
+            - useYn: 사용 여부 (Y/N, null 허용)
             - 만료일 기준 오름차순 정렬됩니다.
             - 페이지네이션을 지원합니다 (page, size, sort 파라미터 사용 가능)
             """,
@@ -69,12 +72,11 @@ public class AppUserCouponController {
     )
     public ResponseEntity<PaginatedResponse<AppUserCouponResponseDto>> getCouponList(
         @AuthenticationPrincipal AppUserEntity appUser,
-        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
+        @Parameter(description = "활성화 여부 (Y/N, null 허용)") @RequestParam(required = false) String activeYn,
+        @Parameter(description = "사용 여부 (Y/N, null 허용)") @RequestParam(required = false) String useYn,
+        @PageableDefault(sort = "endDate", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        if (appUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        return ResponseEntity.ok(appUserCouponService.getCouponList(appUser, pageable));
+        return ResponseEntity.ok(appUserCouponService.getCouponList(appUser, activeYn, useYn, pageable));
     }
 
     @PostMapping("/register")
@@ -130,6 +132,7 @@ public class AppUserCouponController {
             - 본인의 쿠폰만 사용할 수 있습니다.
             - 사용 가능한 쿠폰만 사용할 수 있습니다 (activeYn='Y', useYn='N').
             - 만료되지 않은 쿠폰만 사용할 수 있습니다.
+            - 쿠폰 사용 시 머니 선물 처리됩니다.(보낸사람 : ADMIN, 받는사람 : 쿠폰 사용자)
             - 사용된 쿠폰은 재사용이 불가능합니다.
             """,
         responses = {
