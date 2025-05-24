@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -81,7 +82,8 @@ public class OrderEntity extends BaseEntity {
     @Schema(
         description = """
             주문 상태
-            
+            * WAITING : 결제대기 상태
+            * PAID : 결제 완료 상태
             * ORDERED: 주문이 접수된 상태
             * PREPARING: 매장에서 주문을 준비 중인 상태
             * READY: 주문 준비가 완료된 상태
@@ -89,8 +91,23 @@ public class OrderEntity extends BaseEntity {
             * CANCELLED: 주문이 취소된 상태
             """,
         example = "ORDERED",
-        allowableValues = {"ORDERED", "PREPARING", "READY", "COMPLETED", "CANCELLED"}
+        allowableValues = {"WAITING","ORDERED", "PREPARING", "READY", "COMPLETED", "CANCELLED"}
     )
     private String orderStatus;
+
+    @Schema(description = "결제 ID", example = "t60")
+    private String paymentTid;
+
+    @Schema(description = "결제 금액", example = "5800")
+    private Integer paidAmount;
+    @Schema(description = "결제 시간", example = "2025-05-24 16:28")
+    private LocalDateTime paidAt;
+    @Schema(description = "결제 실패 사유", example = "결제코드 오류")
+    private String failReason;
+    @Schema(description = "결제 실패 시간", example = "2025-05-24 16:28")
+    private LocalDateTime failAt;
+
+
+
 }
 
